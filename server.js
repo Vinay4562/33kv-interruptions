@@ -64,22 +64,22 @@ const credentials = {
 };
 
 // Login route
+// Login route
 app.post('/login', passport.authenticate('local'), (req, res) => {
-    if (req.user) {
-        res.json({ success: true, substation: req.user.substation });
-    } else {
-        res.status(401).json({ success: false, message: 'Authentication failed' });
-    }
+    res.json({ success: true, substation: req.user.substation });
 });
 
 // Logout route
 app.post('/api/logout', (req, res) => {
     req.logout((err) => {
-        if (err) return res.status(500).json({ message: 'Logout error' });
+        if (err) {
+            return res.status(500).json({ message: 'Logout error' });
+        }
         res.clearCookie('connect.sid'); // Clear the session cookie
         res.status(200).json({ message: 'Logged out successfully' });
     });
 });
+
 
 // CRUD Operations for Interruptions
 app.get('/api/interruptions', async (req, res) => {

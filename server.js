@@ -40,6 +40,7 @@ passport.use(new LocalStrategy((username, password, done) => {
     }
 }));
 
+
 passport.serializeUser((user, done) => {
     done(null, user.username);
 });
@@ -70,11 +71,12 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
     }
 });
 
-// General error handler
+// Passport error handling
 app.use((err, req, res, next) => {
-    console.error('Server Error:', err.stack);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Passport Error:', err); // Log Passport errors
+    res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {

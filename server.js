@@ -63,8 +63,19 @@ const credentials = {
 
 // Login route
 app.post('/login', passport.authenticate('local'), (req, res) => {
-    res.json({ success: true, substation: req.user.substation });
+    if (req.user) {
+        res.json({ success: true, substation: req.user.substation });
+    } else {
+        res.status(401).json({ success: false, message: 'Authentication failed' });
+    }
 });
+
+// Error handling for unhandled routes or issues
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err.stack);
+    res.status(500).json({ message: 'Internal Server Error' });
+});
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {

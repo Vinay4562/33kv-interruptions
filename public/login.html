@@ -155,7 +155,7 @@
 
     <script>
     // Assuming you have a login form with username and password fields
-    document.getElementById('login-form').addEventListener('submit', function (event) {
+        document.getElementById('login-form').addEventListener('submit', function (event) {
         event.preventDefault();
 
         const username = document.getElementById('username').value;
@@ -168,7 +168,13 @@
             },
             body: JSON.stringify({ username, password })
         })
-        .then(response => response.json())
+        .then(response => {
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse JSON if response is OK
+        })
         .then(data => {
             const errorDiv = document.getElementById('login-error');
             const successDiv = document.getElementById('login-success');
@@ -195,7 +201,6 @@
             errorDiv.style.display = 'block';
         });
     });
-
     </script>
 </body>
 </html>

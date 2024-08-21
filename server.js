@@ -7,6 +7,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
 require('dotenv').config();
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
+}));
+
+// Apply CORS middleware
+app.use(cors({
+    origin: 'https://33kv-interruptions-o0mzf28x8-vinay-kumars-projects-f1559f4a.vercel.app' // Replace with your client origin
 }));
 
 

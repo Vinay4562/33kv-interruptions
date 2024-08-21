@@ -5,6 +5,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();

@@ -1,0 +1,357 @@
+        /* General styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+            color: #495057;
+        }
+
+        .header {
+            background-color: white;
+            color: red;
+            text-decoration:underline 2px;
+            padding: 0px 0;
+            text-align: center;      
+            margin-bottom: 40px; 
+            background-color: #e9ecef;
+        }
+
+        .header h1 {
+            font-size: 35px;
+        }
+
+        .header img {
+            position: absolute; /* Position the image */
+            top: 15px; /* Align the image to the top */
+            left: 25px; /* Align the image to the left */
+            width: 120px;
+            height: 100px;
+        }
+
+        .navbar {
+            background-color: #e9ecef;
+            overflow: hidden;
+            display: flex;
+            justify-content:right;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 0;
+            padding-top: 0px;
+            width: 100%; /* Set the navbar width to 100% of the viewport */
+            top: 50px; /* Set the top position to below the header */
+            z-index: 1000; /* Ensure the navbar is above other content */
+        }
+
+        .navbar a {
+            color: black;
+            text-align: center;
+            padding: 10px 15px;
+            text-decoration: none;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            margin-left: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background: #ffd000;
+            color: #fff;
+            border-radius: 40px;
+            font-weight: bold;
+        }
+
+        .navbar a:last-child {
+            margin-right: 10px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            text-decoration: underline;
+            font-size: 40px;
+        }
+
+        .navbar button#logout-button {
+            background-color: #f44336; /* Bright red background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 12px 25px; /* Larger padding for a more prominent button */
+            border-radius: 8px; /* More rounded corners */
+            margin-right: 15px; /* Increased margin to separate from other elements */
+            margin-bottom: 15px; /* Increased margin for better spacing */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 16px; /* Larger font size */
+            font-weight: bold; /* Bold text for emphasis */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+        }
+
+        .navbar button#logout-button:hover {
+            background-color: #e53935; /* Darker red on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .navbar button#logout-button:active {
+            background-color: #c62828; /* Even darker red when button is pressed */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Reduced shadow on press */
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-container label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .filter-container input, .filter-container select, .filter-container button {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .filter-container button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .filter-container button:hover {
+            background-color: #45a049;
+        }
+
+        .sort-container {
+            margin-bottom: 10px;
+        }
+
+        .sort-container select {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        /* Form Styles */
+        form {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        form input, form select, form button {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        form input:focus, form select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #45a049;
+        }
+
+        form input[readonly] {
+            background-color: #f9f9f9;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #004d99;
+            color: #fff;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .button-edit, .button-delete {
+            padding: 8px 16px; /* Increased padding for a more prominent button */
+            margin-right: 10px; /* Increased margin for better spacing between buttons */
+            border-radius: 8px; /* More rounded corners for a softer look */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 14px; /* Larger font size for better readability */
+            font-weight: bold; /* Bold text for emphasis */
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+        }
+
+        .button-edit {
+            background-color: #4CAF50; /* Bright yellow */
+            color: #fff; /* White text */
+            margin-right: 15px; /* Increased margin to create space between buttons */
+        }
+
+        .button-edit:hover {
+            background-color: #148b18; /* Darker yellow on hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .button-delete {
+            background-color: #f44336; /* Red */
+            color: #fff; /* White text */
+        }
+
+        .button-delete:hover {
+            background-color: #e53935; /* Darker red on hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+
+        /* Popup Styles */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile View Styles */
+        @media (max-width: 768px) {
+            .header img {
+                width: 80px;
+                height: 60px;
+                top: 10px;
+                left: 10px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px;
+                box-shadow: none; /* Remove shadow for mobile */
+            }
+
+            .navbar a {
+                margin-left: 0;
+                margin-bottom: 10px;
+                text-align: left;
+            }
+
+            .navbar button#logout-button {
+                margin-right: 0;
+                margin-bottom: 10px;
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1, h2 {
+                font-size: 30px;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-container label {
+                margin-bottom: 10px;
+            }
+
+            .filter-container input,
+            .filter-container select,
+            .filter-container button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .sort-container select {
+                width: 100%;
+            }
+
+            form {
+                margin: 10px 0;
+            }
+
+            form input, form select, form button {
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+
+            .button-edit, .button-delete {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .popup {
+                width: 90%;
+                padding: 15px;
+            }
+        }

@@ -65,7 +65,7 @@ const credentials = {
 };
 
 // Login route
-app.post('https://33kv-interruptions-baqorsn25-vinay-kumars-projects-f1559f4a.vercel.app/login', passport.authenticate('local'), (req, res) => {
+app.post('/login', passport.authenticate('local'), (req, res) => {
     res.json({ success: true, substation: req.user.substation });
 });
 

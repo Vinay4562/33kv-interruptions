@@ -10,7 +10,6 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public'))); // Fix typo
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -67,10 +66,28 @@ app.get('/interruption.html', ensureAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'interruption.html'));
 });
 
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login.html'); // Redirect to login page if not authenticated
+}
+
+
 // Login route
-app.post('/login', passport.authenticate('local'), (req, res) => {
-    res.json({ success: true, substation: req.user.substation });
+app.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) return next(err);
+        if (!user) {
+            return res.status(401).json({ success: false, message: info.message });
+        }
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            return res.json({ success: true, substation: user.substation });
+        });
+    })(req, res, next);
 });
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {

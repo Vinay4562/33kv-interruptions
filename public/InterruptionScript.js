@@ -457,13 +457,6 @@ document.addEventListener('DOMContentLoaded', function () {
     sortBySelect.addEventListener('change', handleSort);
 });
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/login.html'); // Redirect to login page if not authenticated
-}
-
 window.onload = function() {
     fetch('/api/check-auth') // Create an endpoint to check if the user is authenticated
         .then(response => {

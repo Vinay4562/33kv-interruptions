@@ -1,13 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const path = require('path');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
-const Feeders = require('./models/Feeders'); // Ensure you have this model
-const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -24,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'chanti225',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));
@@ -53,15 +50,15 @@ passport.deserializeUser((username, done) => {
 });
 
 const credentials = {
-    "220/132/33KV Tandur": { username: "tandur220kv", password: "tandur@V514" },
-    "220KV SS Chandanavally": { username: "chandanavally220kv", password: "chandanavally@V168" },
-    "132/33KV Kodangal": { username: "kodangal132kv", password: "kodangal@V784" },
-    "132/33KV Kanakamamidi": { username: "kanakamamidi132kv", password: "kanakamamidi@V642" },
-    "132/33KVSS Parigi": { username: "parigi132kv", password: "parigi@V326" },
-    "132/33KVSS Puttapahad": { username: "puttapahad132kv", password: "puttapahad@V198" },
-    "132/33KVSS  SRIRANGAPUR": { username: "srirangapur132kv", password: "srirangapur@V446" },
-    "132/33KVSS  Vikarabad": { username: "vikarabad132kv", password: "vikarabad@V156" },
-    "132/33KV Donthanpally": { username: "donthanpally132kv", password: "donthanpally@V848" }
+    "220/132/33KV Tandur": { username: "tandurUser", password: "tandurPass" },
+    "220KV SS Chandanavally": { username: "chandanavallyUser", password: "chandanavallyPass" },
+    "132/33KV Kodangal": { username: "kodangalUser", password: "kodangalPass" },
+    "132/33KV Kanakamamidi": { username: "kanakamamidiUser", password: "kanakamamidiPass" },
+    "132/33KVSS Parigi": { username: "parigiUser", password: "parigiPass" },
+    "132/33KVSS Puttapahad": { username: "puttapahadUser", password: "puttapahadPass" },
+    "132/33KVSS  SRIRANGAPUR": { username: "srirangapurUser", password: "srirangapurPass" },
+    "132/33KVSS  Vikarabad": { username: "vikarabadUser", password: "vikarabadPass" },
+    "132/33KV Donthanpally": { username: "donthanpallyUser", password: "donthanpallyPass" }
 };
 
 // Login route
@@ -70,18 +67,10 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 });
 
 // Logout route
-app.post('/api/logout', (req, res, next) => {
-    req.logout(err => {
-        if (err) {
-            return next(err);
-        }
-        req.session.destroy(err => {
-            if (err) {
-                return next(err);
-            }
-            res.clearCookie('connect.sid');
-            res.status(200).json({ message: 'Logged out successfully' });
-        });
+app.post('/api/logout', (req, res) => {
+    req.logout(() => {
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.status(200).json({ message: 'Logged out successfully' });
     });
 });
 
@@ -105,13 +94,15 @@ app.get('/api/interruptions', async (req, res) => {
 app.get('/filter-feeders', (req, res) => {
     const userSubstation = req.session.substation;
     
+    // Fetch feeders based on the user's substation
     Feeders.find({ substation: userSubstation }, (err, feeders) => {
-        if (err) {
-            return res.status(500).send('Error retrieving feeders.');
-        }
-        res.json(feeders);
+      if (err) {
+        return res.status(500).send('Error retrieving feeders.');
+      }
+      res.json(feeders);
     });
-});
+  });
+  
 
 app.post('/api/interruptions', async (req, res) => {
     try {

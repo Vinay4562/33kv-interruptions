@@ -10,7 +10,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
-pp.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); // Fix typo
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'chantichanti2255', // Make sure this is set
+    secret: process.env.SESSION_SECRET || 'chantichanti2255', // Ensure this is set
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
@@ -71,13 +71,6 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
     }
 });
 
-// Passport error handling
-app.use((err, req, res, next) => {
-    console.error('Passport Error:', err); // Log Passport errors
-    res.status(500).json({ message: 'Internal Server Error', error: err.message });
-});
-
-
 // Logout route
 app.post('/api/logout', (req, res) => {
     req.logout((err) => {
@@ -103,7 +96,6 @@ app.get('/api/interruptions', async (req, res) => {
     }
 });
 
-// Express.js route handling the filter request
 app.get('/filter-feeders', async (req, res) => {
     const userSubstation = req.session.substation;
     

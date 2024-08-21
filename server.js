@@ -6,28 +6,28 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
+const Feeders = require('./models/Feeders'); // Ensure you have this model
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
-
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+// Security Middleware
+app.use(helmet());
+
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB connected...'))
 .catch(err => console.error('Database connection error:', err));
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET || chanti225 ,
+    secret: process.env.SESSION_SECRET || 'chanti225',
     resave: false,
     saveUninitialized: false
 }));
-
 
 // Initialize Passport.js
 app.use(passport.initialize());
@@ -71,15 +71,15 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 
 // Logout route
 app.post('/api/logout', (req, res, next) => {
-    req.logout((err) => {
+    req.logout(err => {
         if (err) {
-            return next(err); // Pass error to the error handler middleware
+            return next(err);
         }
-        req.session.destroy((err) => {
+        req.session.destroy(err => {
             if (err) {
-                return next(err); // Handle session destruction error
+                return next(err);
             }
-            res.clearCookie('connect.sid'); // Clear the session cookie
+            res.clearCookie('connect.sid');
             res.status(200).json({ message: 'Logged out successfully' });
         });
     });
@@ -105,15 +105,13 @@ app.get('/api/interruptions', async (req, res) => {
 app.get('/filter-feeders', (req, res) => {
     const userSubstation = req.session.substation;
     
-    // Fetch feeders based on the user's substation
     Feeders.find({ substation: userSubstation }, (err, feeders) => {
-      if (err) {
-        return res.status(500).send('Error retrieving feeders.');
-      }
-      res.json(feeders);
+        if (err) {
+            return res.status(500).send('Error retrieving feeders.');
+        }
+        res.json(feeders);
     });
-  });
-  
+});
 
 app.post('/api/interruptions', async (req, res) => {
     try {

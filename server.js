@@ -7,11 +7,11 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
 require('dotenv').config();
-const cors = require('cors');
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -28,28 +28,10 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// Apply CORS middleware
-app.use(cors({
-    origin: 'https://33kv-interruptions-o0mzf28x8-vinay-kumars-projects-f1559f4a.vercel.app', // Your frontend URL
-    credentials: true
-}));
 
 // Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Define credentials
-const credentials = {
-    "220/132/33KV Tandur": { username: "tandur220kv", password: "tandur@V514" },
-    "220KV SS Chandanavally": { username: "chandanavally220kv", password: "chandanavally@V168" },
-    "132/33KV Kodangal": { username: "kodangal132kv", password: "kodangal@V784" },
-    "132/33KV Kanakamamidi": { username: "kanakamamidi132kv", password: "kanakamamidi@V642" },
-    "132/33KVSS Parigi": { username: "parigi132kv", password: "parigi@V326" },
-    "132/33KVSS Puttapahad": { username: "puttapahad132kv", password: "puttapahad@V198" },
-    "132/33KVSS  SRIRANGAPUR": { username: "srirangapur132kv", password: "srirangapur@V446" },
-    "132/33KVSS  Vikarabad": { username: "vikarabad132kv", password: "vikarabad@V156" },
-    "132/33KV Donthanpally": { username: "donthanpally132kv", password: "donthanpally@V848" }
-};
 
 // Passport.js configuration
 passport.use(new LocalStrategy((username, password, done) => {
@@ -70,40 +52,34 @@ passport.deserializeUser((username, done) => {
     done(null, { username, substation });
 });
 
+const credentials = {
+    "220/132/33KV Tandur": { username: "tandur220kv", password: "tandur@V514" },
+    "220KV SS Chandanavally": { username: "chandanavally220kv", password: "chandanavally@V168" },
+    "132/33KV Kodangal": { username: "kodangal132kv", password: "kodangal@V784" },
+    "132/33KV Kanakamamidi": { username: "kanakamamidi132kv", password: "kanakamamidi@V642" },
+    "132/33KVSS Parigi": { username: "parigi132kv", password: "parigi@V326" },
+    "132/33KVSS Puttapahad": { username: "puttapahad132kv", password: "puttapahad@V198" },
+    "132/33KVSS  SRIRANGAPUR": { username: "srirangapur132kv", password: "srirangapur@V446" },
+    "132/33KVSS  Vikarabad": { username: "vikarabad132kv", password: "vikarabad@V156" },
+    "132/33KV Donthanpally": { username: "donthanpally132kv", password: "donthanpally@V848" }
+};
+
 // Login route
-app.post('/login', (req, res, next) => {
-    console.log('Login request received:', req.body);
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            console.error('Authentication error:', err);
-            return next(err);
-        }
-        if (!user) {
-            console.log('Authentication failed:', info.message);
-            return res.status(401).json({ success: false, message: info.message || 'Authentication failed' });
-        }
-        req.logIn(user, (err) => {
-            if (err) {
-                console.error('Login error:', err);
-                return next(err);
-            }
-            console.log('Login successful:', user);
-            res.json({ success: true, substation: user.substation });
-        });
-    })(req, res, next);
+app.post('/login', passport.authenticate('local'), (req, res) => {
+    res.json({ success: true, substation: req.user.substation });
 });
 
 // Logout route
 app.post('/api/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) {
-            return next(err);
+            return next(err); // Pass error to the error handler middleware
         }
         req.session.destroy((err) => {
             if (err) {
-                return next(err);
+                return next(err); // Handle session destruction error
             }
-            res.clearCookie('connect.sid');
+            res.clearCookie('connect.sid'); // Clear the session cookie
             res.status(200).json({ message: 'Logged out successfully' });
         });
     });
@@ -136,9 +112,9 @@ app.get('/filter-feeders', (req, res) => {
       }
       res.json(feeders);
     });
-});
+  });
+  
 
-// Create new interruption
 app.post('/api/interruptions', async (req, res) => {
     try {
         const interruption = new Interruption(req.body);
@@ -150,7 +126,6 @@ app.post('/api/interruptions', async (req, res) => {
     }
 });
 
-// Update existing interruption
 app.put('/api/interruptions/:id', async (req, res) => {
     try {
         const interruption = await Interruption.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -164,7 +139,6 @@ app.put('/api/interruptions/:id', async (req, res) => {
     }
 });
 
-// Delete an interruption
 app.delete('/api/interruptions/:id', async (req, res) => {
     try {
         const interruption = await Interruption.findByIdAndDelete(req.params.id);
@@ -180,7 +154,7 @@ app.delete('/api/interruptions/:id', async (req, res) => {
 
 // Catch-all error handler
 app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err);
+    console.error(err.stack);
     res.status(500).send('Something went wrong!');
 });
 

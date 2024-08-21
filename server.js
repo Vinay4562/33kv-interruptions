@@ -6,11 +6,10 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 const Interruption = require('./models/Interruption');
 require('dotenv').config();
-const path = require('path');
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -21,9 +20,10 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'chantichanti2255', // Make sure this is set
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true if using HTTPS
 }));
 
 // Initialize Passport.js
@@ -39,7 +39,6 @@ passport.use(new LocalStrategy((username, password, done) => {
         return done(null, false, { message: 'Invalid username or password' });
     }
 }));
-
 
 passport.serializeUser((user, done) => {
     done(null, user.username);

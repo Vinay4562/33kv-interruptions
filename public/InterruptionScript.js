@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Notify user and redirect
                     alert('Logout successful!');
+                    history.replaceState(null, null, '/login.html');
                     window.location.replace('/login.html'); // Redirect to login page or home page
                 } else {
                     // Handle server-side errors
@@ -455,3 +456,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sortBySelect.addEventListener('change', handleSort);
 });
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login.html'); // Redirect to login page if not authenticated
+}
+
+window.onload = function() {
+    fetch('/api/check-auth') // Create an endpoint to check if the user is authenticated
+        .then(response => {
+            if (response.status === 401) {
+                window.location.href = '/login.html'; // Redirect to login page if not authenticated
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = '/login.html';
+        });
+};

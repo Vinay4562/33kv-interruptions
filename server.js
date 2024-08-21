@@ -63,11 +63,24 @@ const credentials = {
     "132/33KV Donthanpally": { username: "donthanpallyUser", password: "donthanpallyPass" }
 };
 
-// Login route
-// Login route
-app.post('/login', passport.authenticate('local'), (req, res) => {
-    res.json({ success: true, substation: req.user.substation });
+app.get('/interruption.html', ensureAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'interruption.html'));
 });
+
+// Login route
+app.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) return next(err);
+        if (!user) {
+            return res.status(401).json({ success: false, message: info.message });
+        }
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            return res.json({ success: true, substation: user.substation });
+        });
+    })(req, res, next);
+});
+
 
 // Logout route
 app.post('/api/logout', (req, res) => {
@@ -76,10 +89,20 @@ app.post('/api/logout', (req, res) => {
             return res.status(500).json({ message: 'Logout error' });
         }
         res.clearCookie('connect.sid'); // Clear the session cookie
+        
+        // Prevent caching
+        res.setHeader('Cache-Control', 'no-store');
         res.status(200).json({ message: 'Logged out successfully' });
     });
 });
 
+app.get('/api/check-auth', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.status(200).json({ authenticated: true });
+    } else {
+        res.status(401).json({ authenticated: false });
+    }
+});
 
 // CRUD Operations for Interruptions
 app.get('/api/interruptions', async (req, res) => {

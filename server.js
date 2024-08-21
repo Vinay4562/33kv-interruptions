@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallbackSecret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));

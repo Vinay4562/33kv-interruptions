@@ -68,19 +68,9 @@ app.get('/interruption.html', ensureAuthenticated, (req, res) => {
 });
 
 // Login route
-app.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) return next(err);
-        if (!user) {
-            return res.status(401).json({ success: false, message: info.message });
-        }
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            return res.json({ success: true, substation: user.substation });
-        });
-    })(req, res, next);
+app.post('/login', passport.authenticate('local'), (req, res) => {
+    res.json({ success: true, substation: req.user.substation });
 });
-
 
 // Logout route
 app.post('/api/logout', (req, res) => {

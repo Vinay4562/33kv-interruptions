@@ -70,12 +70,11 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
     }
 });
 
-// Error handling for unhandled routes or issues
+// General error handler
 app.use((err, req, res, next) => {
     console.error('Server Error:', err.stack);
     res.status(500).json({ message: 'Internal Server Error' });
 });
-
 
 // Logout route
 app.post('/api/logout', (req, res) => {

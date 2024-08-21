@@ -69,18 +69,23 @@ const credentials = {
 
 // Login route
 app.post('/login', (req, res, next) => {
+    console.log('Login request received:', req.body); // Log request details
     passport.authenticate('local', (err, user, info) => {
         if (err) {
-            return next(err); // Handle server error
+            console.error('Authentication error:', err); // Log error details
+            return next(err);
         }
         if (!user) {
-            return res.status(401).json({ success: false, message: info.message }); // Authentication failed
+            console.log('Authentication failed:', info.message); // Log failure message
+            return res.status(401).json({ success: false, message: info.message || 'Authentication failed' });
         }
         req.logIn(user, (err) => {
             if (err) {
-                return next(err); // Handle login error
+                console.error('Login error:', err); // Log error details
+                return next(err);
             }
-            return res.json({ success: true, substation: user.substation });
+            console.log('Login successful:', user); // Log success
+            res.json({ success: true, substation: user.substation });
         });
     })(req, res, next);
 });

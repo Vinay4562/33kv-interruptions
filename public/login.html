@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://vercel.live;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';">
     <title>Login</title>
     <style>
         body {
@@ -127,6 +127,19 @@
             background-color: #d4edda;
             color: #155724;
         }
+
+        /* Media Query for Mobile */
+    @media (max-width: 600px) {
+        .container {
+            width: 90%;
+            padding: 15px;
+        }
+        
+        .navbar a {
+            font-size: 14px;
+            padding: 8px 10px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -154,7 +167,6 @@
         </form>
     </div>
 
-    <script src="https://vercel.live/_next-live/feedback/feedback.js"></script>
     <script>
     // Assuming you have a login form with username and password fields
     document.getElementById('login-form').addEventListener('submit', function (event) {

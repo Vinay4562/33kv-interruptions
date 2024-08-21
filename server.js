@@ -20,10 +20,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'fallbackSecret',
     resave: false,
     saveUninitialized: false
 }));
+
 
 // Initialize Passport.js
 app.use(passport.initialize());

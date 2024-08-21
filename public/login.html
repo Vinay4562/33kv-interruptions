@@ -157,45 +157,50 @@
     <script>
     // Assuming you have a login form with username and password fields
     document.getElementById('login-form').addEventListener('submit', function (event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-        fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        })
-        .then(response => response.json())
-        .then(data => {
-            const errorDiv = document.getElementById('login-error');
-            const successDiv = document.getElementById('login-success');
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Attempt to parse JSON
+    })
+    .then(data => {
+        const errorDiv = document.getElementById('login-error');
+        const successDiv = document.getElementById('login-success');
 
-            // Clear previous messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
+        // Clear previous messages
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
 
-            if (data.success) {
-                alert('Login successful!');
-                successDiv.textContent = 'Login successful!';
-                successDiv.style.display = 'block';
-                sessionStorage.setItem('substationName', data.substation);
-                window.location.href = `/interruption.html?substation=${encodeURIComponent(data.substation)}`;
-            } else {
-                errorDiv.textContent = 'Wrong username or password. Please try again.';
-                errorDiv.style.display = 'block';
-            }
-        })
-        .catch(error => {
-            console.error('Login error:', error);
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.textContent = 'An error occurred during login. Please try again later.';
+        if (data.success) {
+            alert('Login successful!');
+            successDiv.textContent = 'Login successful!';
+            successDiv.style.display = 'block';
+            sessionStorage.setItem('substationName', data.substation);
+            window.location.href = `/interruption.html?substation=${encodeURIComponent(data.substation)}`;
+        } else {
+            errorDiv.textContent = data.message || 'Wrong username or password. Please try again.';
             errorDiv.style.display = 'block';
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Login error:', error);
+        const errorDiv = document.getElementById('login-error');
+        errorDiv.textContent = 'An error occurred during login. Please try again later.';
+        errorDiv.style.display = 'block';
     });
+});
 
     </script>
 </body>

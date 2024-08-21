@@ -30,10 +30,7 @@ app.use(session({
 }));
 
 // Apply CORS middleware
-app.use(cors({
-    origin: 'https://33kv-interruptions-o0mzf28x8-vinay-kumars-projects-f1559f4a.vercel.app' // Replace with your client origin
-}));
-
+app.use(cors()); // Allow all origins
 
 // Initialize Passport.js
 app.use(passport.initialize());
@@ -71,9 +68,23 @@ const credentials = {
 };
 
 // Login route
-app.post('/login', passport.authenticate('local'), (req, res) => {
-    res.json({ success: true, substation: req.user.substation });
+app.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return next(err); // Handle server error
+        }
+        if (!user) {
+            return res.status(401).json({ success: false, message: info.message }); // Authentication failed
+        }
+        req.logIn(user, (err) => {
+            if (err) {
+                return next(err); // Handle login error
+            }
+            return res.json({ success: true, substation: user.substation });
+        });
+    })(req, res, next);
 });
+
 
 // Logout route
 app.post('/api/logout', (req, res, next) => {

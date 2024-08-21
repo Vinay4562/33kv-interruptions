@@ -10,6 +10,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+pp.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,

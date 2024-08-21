@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const path = require('path');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
@@ -10,6 +11,8 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -67,10 +70,18 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 });
 
 // Logout route
-app.post('/api/logout', (req, res) => {
-    req.logout(() => {
-        res.clearCookie('connect.sid'); // Clear the session cookie
-        res.status(200).json({ message: 'Logged out successfully' });
+app.post('/api/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err); // Pass error to the error handler middleware
+        }
+        req.session.destroy((err) => {
+            if (err) {
+                return next(err); // Handle session destruction error
+            }
+            res.clearCookie('connect.sid'); // Clear the session cookie
+            res.status(200).json({ message: 'Logged out successfully' });
+        });
     });
 });
 

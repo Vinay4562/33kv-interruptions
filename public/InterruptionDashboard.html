@@ -8,436 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* General body styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #e2e2e2, #ffffff);
-        }
-
-        /* Header styling */
-        .header {
-            background-color: white;
-            color: red;
-            text-decoration:underline 2px;
-            padding: 0px 0;
-            text-align: center;      
-            margin-bottom: 40px; 
-            background: linear-gradient(to right, #e2e2e2, #ffffff);
-        }
-
-        .header h1 {
-            font-size: 35px;
-        }
-
-        .header img {
-            position: absolute; /* Position the image */
-            top: 15px; /* Align the image to the top */
-            left: 25px; /* Align the image to the left */
-            width: 120px;
-            height: 100px;
-        }
-
-        /* Navigation bar styling */
-        .navbar {
-            display: flex;
-            justify-content: center;
-            background-color: #0056b3;
-            padding: 10px 0;
-            margin: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-        }
-
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px 15px;
-            font-size: 1.1em;
-            text-align: center;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .navbar a:hover {
-            background-color: #004080;
-        }
-
-        /* Container styling */
-        .container {
-            padding: 30px;
-            max-width: 1200px;
-            margin: auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Filters and search bar styling */
-        .filters {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .filters label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .filters input[type="date"], .filters button {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .filters input[type="date"] {
-            flex: 1;
-        }
-
-        .filters button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        .filters button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .search-bar {
-            margin-bottom: 20px;
-        }
-
-        .search-bar input {
-            width: 98%;
-            padding: 12px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Style for rows with 'Nil' values */
-        .nil-value {
-            background-color: yellow;
-        }
-
-        /* Download buttons styling */
-        .download-buttons {
-            margin-bottom: 20px;
-            margin-left: 73%;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            display: none;
-        }
-
-        .download-buttons button {
-            padding: 7px 15px;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: opacity 0.3s, box-shadow 0.3s;
-        }
-
-        .download-buttons button i {
-            margin-right: 8px;
-        }
-
-        .download-buttons button:nth-of-type(1) {
-            background-color: #13882e; /* Green */
-        }
-
-        .download-buttons button:nth-of-type(2) {
-            background-color: #dc3545; /* Red */
-        }
-
-        .download-buttons button:hover {
-            opacity: 0.9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Table styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        table thead {
-            background: linear-gradient(to right, #003d99, #004080);
-            color: #fff;
-        }
-
-        table th, table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table th {
-            background: linear-gradient(to right, #004080, #003d99);
-        }
-
-        /* Loading spinner styling */
-        .loading {
-            display: none;
-            text-align: center;
-            font-size: 1.5em;
-            color: #007bff;
-            margin: 20px 0;
-        }
-
-        /* Style for rows with nil values */
-        .nil-value {
-            position: relative;
-        }
-
-        /* Tooltip container */
-        .tooltip {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        /* Show the tooltip when hovering */
-        .nil-value:hover .tooltip {
-            display: block;
-        }
-
-        /* Mobile View Styles */
-        @media (max-width: 768px) {
-            /* General body styles */
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 0;
-                padding: 0;
-                background: linear-gradient(to right, #e2e2e2, #ffffff);
-            }
-
-            /* Header styling */
-            .header {
-                background-color: white;
-                color: red;
-                text-decoration: underline 2px;
-                padding: 10px;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .header img {
-                position: relative; /* Adjust positioning for mobile */
-                width: 100px;
-                height: 80px;
-                margin: 0 auto;
-            }
-
-            /* Navigation bar styling */
-            .navbar {
-                display: flex;
-                flex-direction: column; /* Stack items vertically on small screens */
-                align-items: center;
-                background-color: #0056b3;
-                padding: 10px 0;
-                margin: 0;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                margin-bottom: 10px;
-            }
-
-            .navbar a {
-                color: #fff;
-                text-decoration: none;
-                padding: 10px 15px;
-                font-size: 1em;
-                text-align: center;
-                border-radius: 5px;
-                transition: background-color 0.3s;
-                display: block; /* Make links block-level for better touch targets */
-            }
-
-            .navbar a:hover {
-                background-color: #004080;
-            }
-
-            /* Container styling */
-            .container {
-                padding: 15px; /* Reduced padding for mobile */
-                margin: 0 auto;
-                background: #fff;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-
-            /* Filters and search bar styling */
-            .filters {
-                margin-bottom: 20px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                align-items: center;
-                flex-direction: column; /* Stack filters vertically on small screens */
-            }
-
-            .filters label {
-                margin-bottom: 5px;
-                font-weight: bold;
-            }
-
-            .filters input[type="date"], .filters button {
-                width: 100%; /* Full width for mobile */
-                padding: 10px;
-                border-radius: 5px;
-                border: 1px solid #ddd;
-            }
-
-            .filters button {
-                background-color: #007bff;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 1em;
-                transition: background-color 0.3s, box-shadow 0.3s;
-            }
-
-            .filters button:hover {
-                background-color: #0056b3;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            .search-bar {
-                margin-bottom: 20px;
-            }
-
-            .search-bar input {
-                width: 100%; /* Full width for mobile */
-                padding: 12px;
-                border-radius: 5px;
-                border: 1px solid #ddd;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            /* Style for rows with 'Nil' values */
-            .nil-value {
-                background-color: yellow;
-            }
-
-            /* Download buttons styling */
-            .download-buttons {
-                margin-bottom: 20px;
-                display: flex;
-                flex-direction: column; /* Stack buttons vertically on small screens */
-                gap: 10px;
-                align-items: center;
-                display: none;
-            }
-
-            .download-buttons button {
-                padding: 10px;
-                border: none;
-                border-radius: 5px;
-                color: #fff;
-                cursor: pointer;
-                font-size: 0.9em;
-                transition: opacity 0.3s, box-shadow 0.3s;
-                width: 100%; /* Full width for mobile */
-            }
-
-            .download-buttons button i {
-                margin-right: 8px;
-            }
-
-            .download-buttons button:nth-of-type(1) {
-                background-color: #13882e; /* Green */
-            }
-
-            .download-buttons button:nth-of-type(2) {
-                background-color: #dc3545; /* Red */
-            }
-
-            .download-buttons button:hover {
-                opacity: 0.9;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            /* Table styling */
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-
-            table thead {
-                background: linear-gradient(to right, #003d99, #004080);
-                color: #fff;
-            }
-
-            table th, table td {
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-                font-size: 0.9em; /* Adjust font size for better readability */
-            }
-
-            table th {
-                background: linear-gradient(to right, #004080, #003d99);
-            }
-
-            /* Loading spinner styling */
-            .loading {
-                display: none;
-                text-align: center;
-                font-size: 1.2em;
-                color: #007bff;
-                margin: 20px 0;
-            }
-
-            /* Tooltip container */
-            .tooltip {
-                display: none;
-                position: absolute;
-                background-color: #333;
-                color: #fff;
-                padding: 5px;
-                border-radius: 4px;
-                font-size: 12px;
-                white-space: nowrap;
-                z-index: 10;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
-            }
-
-            /* Show the tooltip when hovering */
-            .nil-value:hover .tooltip {
-                display: block;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="InterruptionsDashboardCSS.css">
 
 </head>
 <body>
@@ -449,7 +20,7 @@
         
     <!-- Navigation bar -->
     <div class="navbar">
-        <a href='#' class="active">Home</a>
+        <a href='https://400kvssshankarpally.free.nf/' class="active">Home</a>
         <a href="#">LC Procedures</a>
         <a href='https://maxregister-git-main-vinay-kumars-projects-f1559f4a.vercel.app/Displaydata_original.html'>Max-Min data</a>
     </div>
@@ -472,30 +43,30 @@
             <button onclick="downloadExcel()">
                 <i class="fas fa-file-excel"></i> Download Excel
             </button>
-            <button onclick="downloadPDF()">
-                <i class="fas fa-file-pdf"></i> Download PDF
-            </button>
+            <button id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> Download PDF</button>
         </div>
 
-        <table id="interruptionsTable">
-            <h2 style="display: none;" id="tableHeading">
-                33KV Interruptions for the 400KV Shankarpally division from [Start Date] to [End Date]
-            </h2>
-            <thead>
-                <tr>
-                    <th>S.No</th>
-                    <th>Substation Name</th>
-                    <th>Feeder Name</th>
-                    <th>Cause of Interruption</th>
-                    <th>From Date & time</th>
-                    <th>To Date & time</th>
-                    <th>Duration</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be populated here -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table id="interruptionsTable">
+                <h2 style="display: none;" id="tableHeading">
+                    33KV Interruptions for the 400KV Shankarpally division from [Start Date] to [End Date]
+                </h2>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Substation Name</th>
+                        <th>Feeder Name</th>
+                        <th>Cause of Interruption</th>
+                        <th>From Date & time</th>
+                        <th>To Date & time</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Add a loading spinner element -->
@@ -569,12 +140,12 @@
                     if (data.length === 0) {
                         heading.textContent = `No interruptions found for the selected date range from ${formattedFromDate} to ${formattedToDate}.`;
                         populateTable([]);
+                        alert('No Interruptions found');
                     } else {
                         heading.textContent = `33KV Interruptions for the 400KV Shankarpally division from ${formattedFromDate} to ${formattedToDate}`;
                         heading.style.display = 'block'; // Make the heading visible
-                        data.sort((a, b) => a.substationName.localeCompare(b.substationName));
-                        interruptionsMap = createInterruptionsMap(data);
-                        populateTable(interruptionsMap);
+                        const interruptionsArray = createInterruptionsMap(data);
+                        populateTable(interruptionsArray);
                     }
                 })
                 .catch(error => {
@@ -589,60 +160,89 @@
                 });
         }
 
-        function createInterruptionsMap(interruptions) {
-            const map = {};
+        function renderInterruptions(interruptions) {
+            // Get the container where interruptions will be displayed
+            const interruptionsContainer = document.getElementById('interruptions-container');
+            
+            // Clear any previous content inside the container
+            interruptionsContainer.innerHTML = ''; 
 
-            // Initialize map with all substations and feeders
+            // Iterate over each interruption in the array
+            interruptions.forEach(interruption => {
+                // Create a div element to hold the interruption details
+                const interruptionElement = document.createElement('div');
+                
+                // Set the inner HTML of the div with the interruption details
+                interruptionElement.innerHTML = `
+                    <div class="interruption-item">
+                        <p><strong>Substation:</strong> ${interruption.substationName}</p>
+                        <p><strong>Feeder:</strong> ${interruption.feederName}</p>
+                        <p><strong>Cause:</strong> ${interruption.cause}</p>
+                        <p><strong>From:</strong> ${new Date(interruption.fromDatetime).toLocaleString()}</p>
+                        <p><strong>To:</strong> ${new Date(interruption.toDatetime).toLocaleString()}</p>
+                    </div>
+                    <hr/>
+                `;
+
+                // Append the interruption details div to the container
+                interruptionsContainer.appendChild(interruptionElement);
+            });
+
+            // If no interruptions are found, display a message
+            if (interruptions.length === 0) {
+                interruptionsContainer.innerHTML = '<p>No interruptions found for the selected date range.</p>';
+            }
+        }
+
+        function createInterruptionsMap(interruptions) {
+            const interruptionsArray = [];
+
+            // Add interruptions for each substation and feeder according to the map
             for (const [substation, feeders] of Object.entries(substationFeederMap)) {
                 feeders.forEach(feeder => {
-                    map[`${substation}_${feeder}`] = null; // Mark as null initially
+                    // Find matching interruptions for this substation and feeder
+                    const matchingInterruptions = interruptions.filter(interruption => 
+                        interruption.substationName === substation && interruption.feederName === feeder
+                    );
+
+                    // Add each interruption to the array
+                    matchingInterruptions.forEach(interruption => {
+                        interruptionsArray.push(interruption);
+                    });
+
+                    // If no interruption is found, add a placeholder
+                    if (matchingInterruptions.length === 0) {
+                        interruptionsArray.push({
+                            substationName: substation,
+                            feederName: feeder,
+                            cause: '***',
+                            fromDatetime: '',
+                            toDatetime: '',
+                            duration: ''
+                        });
+                    }
                 });
             }
 
-            // Populate map with fetched interruptions
-            interruptions.forEach(interruption => {
-                const key = `${interruption.substationName}_${interruption.feederName}`;
-                map[key] = interruption;
-            });
-
-            // Ensure every substation and feeder combination has a value (empty or with data)
-            for (const key in map) {
-                if (map[key] === null) {
-                    map[key] = {
-                        cause: '***',
-                        fromDatetime: '',
-                        toDatetime: '',
-                        duration: ''
-                    };
-                }
-            }
-
-            return map;
+            return interruptionsArray;
         }
 
-        function populateTable(interruptionsMap) {
+        function populateTable(interruptions) {
             const tableBody = document.getElementById('interruptionsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
             let serialNumber = 1;
 
-            for (const [key, interruption] of Object.entries(interruptionsMap)) {
-                const [substation, feeder] = key.split('_');
+            interruptions.forEach(interruption => {
                 const row = document.createElement('tr');
                 
-                // Check for "Nil" values and apply a class if found
-                const hasNil = Object.values(interruption).includes('***');
-                const rowClass = hasNil ? 'nil-value' : '';
-
-                row.className = rowClass;
-
-                // Create a tooltip if the row has "Nil" values
-                const tooltip = hasNil ? '<div class="tooltip">No data entered</div>' : '';
+                row.className = interruption.cause === '***' ? 'nil-value' : '';
+                const tooltip = interruption.cause === '***' ? '<div class="tooltip">No data entered</div>' : '';
 
                 row.innerHTML = `
                     <td>${serialNumber++}</td>
-                    <td>${substation}</td>
-                    <td>${feeder}</td>
+                    <td>${interruption.substationName}</td>
+                    <td>${interruption.feederName}</td>
                     <td>${interruption.cause}</td>
                     <td>${formatDateTime(interruption.fromDatetime)}</td>
                     <td>${formatDateTime(interruption.toDatetime)}</td>
@@ -650,7 +250,7 @@
                     ${tooltip}
                 `;
                 tableBody.appendChild(row);
-            }
+            });
         }
 
         function searchTable() {
@@ -687,25 +287,32 @@
             const heading = `33KV Interruptions from ${formattedFromDate} to ${formattedToDate}`;
 
             // Prepare the data including the heading
-            const data = Object.entries(interruptionsMap).map(([key, interruption], index) => {
-                const [substation, feeder] = key.split('_');
-                return {
-                    "S.No": index + 1,
-                    "Substation Name": substation,
-                    "Feeder Name": feeder,
-                    "Cause of Interruption": interruption.cause,
-                    "From Date & time": formatDateTime(interruption.fromDatetime),
-                    "To Date & time": formatDateTime(interruption.toDatetime),
-                    "Duration": interruption.duration
-                };
-            });
+            const table = document.getElementById('interruptionsTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const data = [];
+            let serialNumber = 1;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName('td');
+                if (cells.length > 0) {
+                    data.push({
+                        "S.No": serialNumber++,
+                        "Substation Name": cells[1].textContent,
+                        "Feeder Name": cells[2].textContent,
+                        "Cause of Interruption": cells[3].textContent,
+                        "From Date & time": cells[4].textContent,
+                        "To Date & time": cells[5].textContent,
+                        "Duration": cells[6].textContent
+                    });
+                }
+            }
 
             // Create a new workbook
             const wb = XLSX.utils.book_new();
-            
+
             // Create a worksheet with the data
             const ws = XLSX.utils.json_to_sheet(data, { header: ["S.No", "Substation Name", "Feeder Name", "Cause of Interruption", "From Date & time", "To Date & time", "Duration"] });
-            
+
             // Insert the heading as the first row in the worksheet
             const wsWithHeading = XLSX.utils.book_new();
             XLSX.utils.sheet_add_aoa(wsWithHeading, [[heading]], { origin: "A1" });
@@ -732,71 +339,78 @@
             XLSX.writeFile(wb, "Interruptions.xlsx");
         }
 
-        function downloadPDF() {
+        document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+
+            // Get the selected dates
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+
+            // Function to format date in DD-MM-YYYY
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+
+            // Format the dates for the heading
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Define title and logo
-            const title = 'TRANSMISSION CORPORATION OF TELANGANA LIMITED';
-            const logoUrl = 'logo_new.png'; // Path to your logo image
+            // Add a header
+            doc.setFontSize(19);
+            doc.setTextColor(40);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Transmission Corporation of Telangana Limited', 105, 20, { align: 'center' });
 
-            // Get the selected dates
-            const fromDateInput = document.getElementById('fromDate').value;
-            const toDateInput = document.getElementById('toDate').value;
+            // Add a sub-header with dynamic date range
+            doc.setFontSize(14);
+            doc.setTextColor(70);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`33KV Interruptions Data from ${formattedFromDate} to ${formattedToDate}`, 105, 30, { align: 'center' });
 
-            // Format dates from YYYY-MM-DD to DD-MM-YYYY
-            const fromDate = formatDate(fromDateInput);
-            const toDate = formatDate(toDateInput);
+            // Add the logo
+            const logo = new Image();
+            logo.src = 'logo_new.png'; // Replace with your logo path
+            logo.onload = function () {
+                doc.addImage(logo, 'PNG', 6, 6, 24, 24); // Adjust the dimensions as needed
 
-            // Add logo to the PDF
-            const logoWidth = 30; // Width of the logo
-            const logoHeight = 20; // Height of the logo
-            doc.addImage(logoUrl, 'PNG', 20, 20, logoWidth, logoHeight);
+                // Add generation date
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text('Generated on: ' + new Date().toLocaleString(), 200, 40, { align: 'right' }); // Adjusted y-coordinate
 
-            // Add title beside the logo
-            doc.setFontSize(15);
-            doc.setFont('Lora', 'bold'); // Ensure the font is available or use a default one
-            doc.text(title, 10 + logoWidth + 10, 30); // Positioned beside the logo with some padding
+                // Add the table data to the PDF
+                doc.autoTable({
+                    html: 'table',
+                    startY: 50, // Adjust this according to the height of your header
+                    styles: {
+                        fontSize: 10,
+                        cellPadding: 3,
+                        valign: 'middle',
+                        halign: 'center',
+                        fillColor: [220, 220, 220],
+                        textColor: [0, 0, 0],
+                    },
+                    headStyles: {
+                        fillColor: [0, 63, 128], // Customizing header color
+                        textColor: [255, 255, 255], // White text for header
+                        fontSize: 12,
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240], // Light grey for alternate rows
+                    },
+                });
 
-            // Add some space before the date range title
-            doc.setFontSize(13);
-            const headingText = `33KV Interruption Report from ${fromDate} to ${toDate}`;
-            const headingX = 20;
-            const headingY = 50; // Adjusted heading Y position to reduce space
+                // Save the PDF
+                doc.save('33KV_Interruptions_Data.pdf');
+            };
+        });
 
-            // Add the heading text
-            doc.text(headingText, headingX, headingY);
-
-            // Draw underline for the heading
-            const textWidth = doc.getTextWidth(headingText);
-            doc.line(headingX, headingY + 2, headingX + textWidth, headingY + 2); // Draw line just below the text
-
-            // Define table columns and rows
-            const tableColumn = ["S.No", "Substation Name", "Feeder Name", "Cause of Interruption", "From Date & time", "To Date & time", "Duration"];
-            const tableRows = Object.entries(interruptionsMap).map(([key, interruption], index) => {
-                const [substation, feeder] = key.split('_');
-                return [
-                    index + 1,
-                    substation,
-                    feeder,
-                    interruption.cause,
-                    formatDateTime(interruption.fromDatetime),
-                    formatDateTime(interruption.toDatetime),
-                    interruption.duration
-                ];
-            });
-
-            // Add table to PDF
-            doc.autoTable({
-                head: [tableColumn],
-                body: tableRows,
-                startY: headingY + 5, // Start the table 5 units below the heading
-                theme: 'striped'
-            });
-
-            // Save the PDF
-            doc.save('Interruptions.pdf');
-        }
     </script>
 </body>
 </html>

@@ -188,6 +188,12 @@
         }
 
         /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling for touch devices */
+            margin: 20px 0; /* Add some margin for spacing */
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -312,6 +318,7 @@
             .filter-container {
                 flex-direction: column;
                 align-items: stretch;
+                display: none;
             }
 
             .filter-container label {
@@ -327,6 +334,7 @@
 
             .sort-container select {
                 width: 100%;
+                display: none;
             }
 
             form {
@@ -338,8 +346,14 @@
                 width: 100%;
             }
 
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+            }
+        
             table {
                 font-size: 14px;
+                width: 100%; /* Ensure table takes full width */
             }
 
             table th, table td {

@@ -1,276 +1,528 @@
-        /* General body styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #e2e2e2, #ffffff);
-        }
-        
-        /* Header styling */
-        .header {
-            background-color: white;
-            color: red;
-            text-decoration: underline 2px;
-            padding: 0;
-            text-align: center;      
-            margin-bottom: 40px; 
-            background: linear-gradient(to right, #e2e2e2, #ffffff);
-        }
-        
-        .header h1 {
-            font-size: 35px;
-        }
-        
-        .header img {
-            position: absolute;
-            top: 15px;
-            left: 25px;
-            width: 120px;
-            height: 100px;
-        }
-        
-        /* Navigation bar styling */
-        .navbar {
-            display: flex;
-            justify-content: center;
-            background-color: #0056b3;
-            padding: 10px 0;
-            margin: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-        }
-        
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px 15px;
-            font-size: 1.1em;
-            text-align: center;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        
-        .navbar a:hover {
-            background-color: #004080;
-        }
-        
-        /* Container styling */
-        .container {
-            padding: 30px;
-            max-width: 1200px;
-            margin: auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Filters and search bar styling */
-        .filters {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .filters label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        
-        .filters input[type="date"], .filters button {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        
-        .filters input[type="date"] {
-            flex: 1;
-        }
-        
-        .filters button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-        
-        .filters button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .search-bar {
-            margin-bottom: 20px;
-        }
-        
-        .search-bar input {
-            width: 98%;
-            padding: 12px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Style for rows with 'Nil' values */
-        .nil-value {
-            background-color: yellow;
-            position: relative;
-        }
-        
-        /* Tooltip container */
-        .tooltip {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            color: #fff;
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-        
-        /* Show the tooltip when hovering */
-        .nil-value:hover .tooltip {
-            display: block;
-        }
-        
-        /* Download buttons styling */
-        .download-buttons {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            display: none;
-        }
-        
-        .download-buttons button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: opacity 0.3s, box-shadow 0.3s;
-        }
-        
-        .download-buttons button i {
-            margin-right: 8px;
-        }
-        
-        .download-buttons button:nth-of-type(1) {
-            background-color: #13882e; /* Green */
-        }
-        
-        .download-buttons button:nth-of-type(2) {
-            background-color: #dc3545; /* Red */
-        }
-        
-        .download-buttons button:hover {
-            opacity: 0.9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Table styling */
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling for touch devices */
-            margin: 20px 0; /* Add some margin for spacing */
-        }
+/* General body styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #e2e2e2, #ffffff);
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        table thead {
-            background: linear-gradient(to right, #003d99, #004080);
-            color: #fff;
-        }
-        
-        table th, table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        table th {
-            background: linear-gradient(to right, #004080, #003d99);
-        }
-        
-        /* Loading spinner styling */
-        .loading {
-            display: none;
-            text-align: center;
-            font-size: 1.5em;
-            color: #007bff;
-            margin: 20px 0;
-        }
-        
-        /* Mobile View Styles */
-        @media (max-width: 480px) {
-             .header {
-                padding: 10px 5px;
-                margin-bottom: 20px;
-            }
+/* Header styling */
+.header {
+    background-color: white;
+    color: red;
+    text-decoration: underline 2px;
+    padding: 0;
+    text-align: center;      
+    margin-bottom: 40px; 
+    background: linear-gradient(to right, #e2e2e2, #ffffff);
+    position: relative; /* Added for hamburger menu positioning */
+}
 
-            .header h1 {
-                font-size: 20px;
-            }
+.header h1 {
+    font-size: 35px;
+}
 
-            .header img {
-                top: 5px;
-                left: 5px;
-                width: 80px;
-                height: 60px;
-            }
+.header img {
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    width: 120px;
+    height: 100px;
+}
 
-            .navbar {
-                flex-direction: column;
-                padding: 5px 0;
-            }
+/* Hamburger menu styling */
+.hamburger-menu {
+    display: none; /* Hidden by default on desktop */
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 24px;
+    color: #0056b3;
+    cursor: pointer;
+}
 
-            .filters, .search-bar {
-                margin-bottom: 10px;
-            }
+/* Navigation bar styling */
+.navbar {
+    display: flex;
+    justify-content: center;
+    background-color: #0056b3;
+    padding: 10px 0;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transition: max-height 0.3s ease; /* Smooth transition for mobile */
+}
 
-            .filters label {
-                font-size: 0.9em;
-            }
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-size: 1.1em;
+    text-align: center;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
 
-            .filters input[type="date"], .filters button {
-                padding: 8px;
-                font-size: 0.9em;
-            }
+.navbar a:hover {
+    background-color: #004080;
+}
 
-            .search-bar input {
-                font-size: 0.9em;
-            }
+/* Container styling */
+.container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-            .table-container {
-                width: 100%;
-                overflow-x: auto;
-            }
+/* Filters and search bar styling */
+.filters {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
 
-            table {
-                font-size: 14px;
-                width: 100%; /* Ensure table takes full width */
-            }
+.filters label {
+    margin-right: 10px;
+    font-weight: bold;
+}
 
-            table th, table td {
-                padding: 8px;
-            }
+.filters input[type="date"], .filters button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
 
-            .loading {
-                font-size: 1.2em;
-                margin: 10px 0;
-            }
-        }
+.filters input[type="date"] {
+    flex: 1;
+}
+
+.filters button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.filters button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    width: 98%;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for rows with 'Nil' values */
+.nil-value {
+    background-color: yellow;
+    position: relative;
+}
+
+/* Tooltip container */
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* Show the tooltip when hovering */
+.nil-value:hover .tooltip {
+    display: block;
+}
+
+/* Download buttons styling */
+.download-buttons {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    display: none;
+}
+
+.download-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: opacity 0.3s, box-shadow 0.3s;
+}
+
+.download-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.download-buttons button i {
+    margin-right: 8px;
+}
+
+.download-buttons button:nth-of-type(1) {
+    background-color: #13882e; /* Green */
+}
+
+.download-buttons button:nth-of-type(2) {
+    background-color: #dc3545; /* Red */
+}
+
+.download-buttons button:not(:disabled):hover {
+    opacity: 0.9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Table styling */
+.table-container {
+    overflow-x: auto;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 400px; /* Set a maximum height for the table */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for touch devices */
+    margin: 20px 0; /* Add some margin for spacing */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table thead {
+    background: linear-gradient(to right, #003d99, #004080);
+    color: #fff;
+    position: sticky; /* Keep header sticky at the top */
+    top: 0;
+    z-index: 1;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background: linear-gradient(to right, #004080, #003d99);
+}
+
+/* Loading spinner styling */
+.loading {
+    display: none;
+    text-align: center;
+    font-size: 1.5em;
+    color: #007bff;
+    margin: 20px 0;
+}
+
+/* Tablet View Styles (max-width: 999px) */
+@media (max-width: 999px) {
+    .header {
+        padding: 10px;
+        margin-bottom: 30px;
+    }
+
+    .header-title {
+        font-size: 28px;
+    }
+
+    .header img {
+        top: 10px;
+        left: 15px;
+        width: 100px;
+        height: 80px;
+    }
+
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .navbar a {
+        padding: 8px 12px;
+        font-size: 1em;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .filters {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .filters label {
+        font-size: 1em;
+    }
+
+    .filters input[type="date"], .filters button {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+    }
+
+    .search-bar input {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+    }
+
+    .download-buttons {
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .download-buttons button {
+        padding: 8px 14px;
+        font-size: 0.9em;
+    }
+
+    .table-container {
+        max-height: 350px; /* Slightly reduce table height */
+    }
+
+    table {
+        font-size: 16px;
+    }
+
+    table th, table td {
+        padding: 10px;
+    }
+
+    .loading {
+        font-size: 1.4em;
+    }
+}
+
+/* Small Tablet/Large Phone View Styles (max-width: 698px) */
+@media (max-width: 698px) {
+    .header {
+        padding: 10px;
+        margin-bottom: 25px;
+    }
+
+    .header-title {
+        font-size: 24px;
+    }
+
+    .header img {
+        top: 10px;
+        left: 10px;
+        width: 90px;
+        height: 70px;
+    }
+
+    /* Hamburger menu visibility */
+    .hamburger-menu {
+        display: block;
+    }
+
+    .navbar {
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        position: absolute;
+        top: 100px; /* Adjust based on header height */
+        right: 0;
+        width: 200px;
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    .navbar.active {
+        display: flex; /* Show when active */
+    }
+
+    .navbar a {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.95em;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .filters {
+        gap: 10px;
+    }
+
+    .filters label {
+        font-size: 0.95em;
+    }
+
+    .filters input[type="date"], .filters button {
+        padding: 8px;
+        font-size: 0.95em;
+    }
+
+    .search-bar input {
+        padding: 8px;
+        font-size: 0.95em;
+    }
+
+    .download-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .download-buttons button {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+
+    .table-container {
+        max-height: 320px; /* Further reduce table height */
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+
+    .loading {
+        font-size: 1.3em;
+    }
+}
+
+/* Mobile View Styles (max-width: 480px) */
+@media (max-width: 480px) {
+    .header {
+        padding: 10px 5px;
+        margin-bottom: 20px;
+    }
+
+    .header-title {
+        font-size: 20px;
+        position: relative;
+        color: transparent; /* Hide original text */
+    }
+
+    .header-title::after {
+        content: "TG TRANSCO";
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: red; /* Match the original color */
+        width: 100%;
+        text-align: center;
+    }
+
+    .header img {
+        top: 5px;
+        left: 5px;
+        width: 80px;
+        height: 60px;
+    }
+
+    /* Hamburger menu visibility */
+    .hamburger-menu {
+        display: block;
+    }
+
+    .navbar {
+        display: none; /* Hidden by default on mobile */
+        flex-direction: column;
+        position: absolute;
+        top: 100px; /* Adjust based on header height */
+        right: 0;
+        width: 200px;
+        background-color: #0056b3;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    .navbar.active {
+        display: flex; /* Show when active */
+    }
+
+    .navbar a {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .filters {
+        gap: 8px;
+    }
+
+    .filters label {
+        font-size: 0.9em;
+    }
+
+    .filters input[type="date"], .filters button {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    .search-bar input {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    .download-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .download-buttons button {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 0.8em;
+    }
+
+    .table-container {
+        max-height: 300px; /* Adjust for mobile */
+    }
+
+    table {
+        font-size: 14px;
+        width: 100%; /* Ensure table takes full width */
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+
+    .loading {
+        font-size: 1.2em;
+        margin: 10px 0;
+    }
+}

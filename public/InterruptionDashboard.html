@@ -9,16 +9,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="InterruptionsDashboardCSS.css">
-
 </head>
 <body>
 
     <div class="header">
-    <img src="logo_new.png" alt="Logo" class="logo" width="130px" height="100px">
-    <h1>𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        <img src="logo_new.png" alt="Logo" class="logo" width="130px" height="100px">
+        <h1 class="header-title">𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        <div class="hamburger-menu">
+            <i class="fas fa-bars"></i>
+        </div>
     </div>
         
-    <!-- Navigation bar -->
+    <!-- Navigation bar (hidden by default on mobile) -->
     <div class="navbar">
         <a href='https://400kvssshankarpally.free.nf/' class="active">Home</a>
         <a href="#">LC Procedures</a>
@@ -40,10 +42,12 @@
         </div>
 
         <div class="download-buttons">
-            <button onclick="downloadExcel()">
+            <button id="downloadExcelBtn" disabled>
                 <i class="fas fa-file-excel"></i> Download Excel
             </button>
-            <button id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> Download PDF</button>
+            <button id="downloadPdfBtn" disabled>
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </button>
         </div>
 
         <div class="table-container">
@@ -141,15 +145,24 @@
                         heading.textContent = `No interruptions found for the selected date range from ${formattedFromDate} to ${formattedToDate}.`;
                         populateTable([]);
                         alert('No Interruptions found');
+                        // Disable download buttons if no data
+                        document.getElementById('downloadExcelBtn').disabled = true;
+                        document.getElementById('downloadPdfBtn').disabled = true;
                     } else {
                         heading.textContent = `33KV Interruptions for the 400KV Shankarpally division from ${formattedFromDate} to ${formattedToDate}`;
                         heading.style.display = 'block'; // Make the heading visible
                         const interruptionsArray = createInterruptionsMap(data);
                         populateTable(interruptionsArray);
+                        // Enable download buttons when data is loaded
+                        document.getElementById('downloadExcelBtn').disabled = false;
+                        document.getElementById('downloadPdfBtn').disabled = false;
                     }
                 })
                 .catch(error => {
                     console.error('Fetch Interruptions error:', error);
+                    // Disable download buttons on error
+                    document.getElementById('downloadExcelBtn').disabled = true;
+                    document.getElementById('downloadPdfBtn').disabled = true;
                 })
                 .finally(() => {
                     // Hide loading spinner
@@ -159,6 +172,12 @@
                     document.querySelector('.download-buttons').style.display = 'block';
                 });
         }
+
+        // Hamburger menu toggle
+        document.querySelector('.hamburger-menu').addEventListener('click', function() {
+            const navbar = document.querySelector('.navbar');
+            navbar.classList.toggle('active');
+        });
 
         function renderInterruptions(interruptions) {
             // Get the container where interruptions will be displayed
@@ -410,6 +429,21 @@
                 doc.save('33KV_Interruptions_Data.pdf');
             };
         });
+
+        // Function to update header title based on screen size
+        function updateHeaderTitle() {
+            const headerTitle = document.querySelector('.header-title');
+            if (window.innerWidth <= 480) {
+                headerTitle.textContent = 'TG TRANSCO';
+            } else {
+                headerTitle.textContent = '𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃';
+            }
+        }
+
+        // Run on page load
+        window.addEventListener('load', updateHeaderTitle);
+        // Run on window resize
+        window.addEventListener('resize', updateHeaderTitle);
 
     </script>
 </body>

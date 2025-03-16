@@ -13,8 +13,10 @@
 <body>
 
     <div class="header">
-        <img src="logo_new.png" alt="Logo" class="logo" width="130px" height="100px">
-        <h1 class="header-title">𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        <div class="header-left">
+            <img src="logo_new.png" alt="Logo" class="logo" width="130px" height="100px">
+            <h1 class="header-title">𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃</h1>
+        </div>
         <div class="hamburger-menu">
             <i class="fas fa-bars"></i>
         </div>
@@ -75,6 +77,10 @@
 
     <!-- Add a loading spinner element -->
     <div class="loading" id="loading">Loading...</div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Transimission Corporation of Telangana Limited All rights reserved.</p>
+    </footer>
 
     <script>
         const substationFeederMap = {
@@ -432,18 +438,18 @@
 
         // Function to update header title based on screen size
         function updateHeaderTitle() {
-            const headerTitle = document.querySelector('.header-title');
-            if (window.innerWidth <= 480) {
-                headerTitle.textContent = 'TG TRANSCO';
-            } else {
-                headerTitle.textContent = '𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃';
-            }
+        const headerTitle = document.querySelector('.header-title');
+        if (window.innerWidth <= 999) { // Change at 999px and below
+            headerTitle.textContent = 'TG TRANSCO';
+        } else {
+            headerTitle.textContent = '𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃';
         }
+    }
 
-        // Run on page load
-        window.addEventListener('load', updateHeaderTitle);
-        // Run on window resize
-        window.addEventListener('resize', updateHeaderTitle);
+    // Run on page load
+    window.addEventListener('load', updateHeaderTitle);
+    // Run on window resize
+    window.addEventListener('resize', updateHeaderTitle);
 
     </script>
 </body>

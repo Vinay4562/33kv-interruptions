@@ -4,6 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(to right, #e2e2e2, #ffffff);
+    display: flex; /* Ensure body takes full height for footer positioning */
+    flex-direction: column; /* Stack content vertically */
+    min-height: 100vh; /* Ensure body takes at least full viewport height */
 }
 
 /* Header styling */
@@ -11,31 +14,38 @@ body {
     background-color: white;
     color: red;
     text-decoration: underline 2px;
-    padding: 0;
-    text-align: center;      
-    margin-bottom: 40px; 
+    padding: 10px 15px; /* Adjusted padding for better spacing */
+    margin-bottom: 0px; 
     background: linear-gradient(to right, #e2e2e2, #ffffff);
-    position: relative; /* Added for hamburger menu positioning */
+    position: relative; /* For hamburger menu positioning */
+    display: flex; /* Use flexbox to align logo and title */
+    align-items: center; /* Vertically center logo and title */
+    justify-content: space-between; /* Space between left content and hamburger */
 }
 
-.header h1 {
-    font-size: 35px;
+/* Container for logo and title to keep them together on the left */
+.header-left {
+    display: flex;
+    align-items: center; /* Vertically center logo and title */
 }
 
+/* Header title styling */
+.header-title {
+    font-size: 35px; /* Reduced from 35px */
+    margin: 0; /* Remove margin to align with logo */
+    text-align: left; /* Align title to the left */
+}
+
+/* Header logo styling */
 .header img {
-    position: absolute;
-    top: 15px;
-    left: 25px;
     width: 120px;
     height: 100px;
+    margin-right: 15px; /* Space between logo and title */
 }
 
 /* Hamburger menu styling */
 .hamburger-menu {
     display: none; /* Hidden by default on desktop */
-    position: absolute;
-    top: 15px;
-    right: 25px;
     font-size: 24px;
     color: #0056b3;
     cursor: pointer;
@@ -75,6 +85,7 @@ body {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1; /* Allow container to grow and push footer to bottom */
 }
 
 /* Filters and search bar styling */
@@ -238,6 +249,21 @@ table th {
     margin: 20px 0;
 }
 
+/* Footer styling */
+.footer {
+    background-color: #0056b3; /* Match navbar color for consistency */
+    color: #fff;
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 1em;
+    margin-top: 10PX; /* Push footer to bottom of page */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.footer p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
 /* Tablet View Styles (max-width: 999px) */
 @media (max-width: 999px) {
     .header {
@@ -246,14 +272,13 @@ table th {
     }
 
     .header-title {
-        font-size: 28px;
+        font-size: 24px; /* Further reduced */
     }
 
     .header img {
-        top: 10px;
-        left: 15px;
         width: 100px;
         height: 80px;
+        margin-right: 10px; /* Reduced space */
     }
 
     .navbar {
@@ -317,6 +342,11 @@ table th {
     .loading {
         font-size: 1.4em;
     }
+
+    .footer {
+        padding: 12px 15px;
+        font-size: 0.95em;
+    }
 }
 
 /* Small Tablet/Large Phone View Styles (max-width: 698px) */
@@ -327,14 +357,13 @@ table th {
     }
 
     .header-title {
-        font-size: 24px;
+        font-size: 20px; /* Further reduced */
     }
 
     .header img {
-        top: 10px;
-        left: 10px;
         width: 90px;
         height: 70px;
+        margin-right: 8px; /* Reduced space */
     }
 
     /* Hamburger menu visibility */
@@ -361,7 +390,7 @@ table th {
     .navbar a {
         padding: 12px;
         text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 0.1);
         font-size: 0.95em;
     }
 
@@ -414,6 +443,11 @@ table th {
     .loading {
         font-size: 1.3em;
     }
+
+    .footer {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
 }
 
 /* Mobile View Styles (max-width: 480px) */
@@ -424,26 +458,13 @@ table th {
     }
 
     .header-title {
-        font-size: 20px;
-        position: relative;
-        color: transparent; /* Hide original text */
-    }
-
-    .header-title::after {
-        content: "TG TRANSCO";
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: red; /* Match the original color */
-        width: 100%;
-        text-align: center;
+        font-size: 18px; /* Further reduced for mobile */
     }
 
     .header img {
-        top: 5px;
-        left: 5px;
         width: 80px;
         height: 60px;
+        margin-right: 5px; /* Reduced space for mobile */
     }
 
     /* Hamburger menu visibility */
@@ -524,5 +545,10 @@ table th {
     .loading {
         font-size: 1.2em;
         margin: 10px 0;
+    }
+
+    .footer {
+        padding: 8px 10px;
+        font-size: 0.85em;
     }
 }

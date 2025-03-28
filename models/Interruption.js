@@ -1,12 +1,11 @@
-// models/Interruption.js
 const mongoose = require('mongoose');
 
 const interruptionSchema = new mongoose.Schema({
     substationName: String,
     feederName: String,
     cause: String,
-    fromDatetime: Date, // Ensure this field exists
-    toDatetime: Date,   // Ensure this field exists
+    fromDatetime: String, // Store as ISO string (e.g., "2025-03-28T01:01:00.000+05:30")
+    toDatetime: String,   // Store as ISO string
     duration: String
 });
 

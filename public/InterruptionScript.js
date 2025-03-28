@@ -12,8 +12,18 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     let highestSerialNumber = 0;
-    let editingId = null; // Variable to keep track of which record is being edited
-    let currentSubstation = null; // Variable to store the current substation name
+    let editingId = null;
+    let currentSubstation = null;
+
+    const dateOptions = {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    };
 
     function getSubstationData(name) {
         return substations.find(substation => substation.name === name);
@@ -29,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (substationName) {
             currentSubstation = substationName;
             const substation = getSubstationData(substationName);
-
             if (substation) {
                 substationDropdown.innerHTML = `<option value="${substation.name}" selected>${substation.name}</option>`;
                 populateSubSubstationDropdown(substation.subSubstations);
@@ -53,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateSubSubstationDropdown(feeders) {
         const subSubstationSelect = document.getElementById('sub-substation-select');
         subSubstationSelect.innerHTML = '<option value="" disabled selected>Select Feeder</option>';
-
         feeders.forEach(feeder => {
             const option = document.createElement('option');
             option.value = feeder;
@@ -68,28 +76,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const durationInput = document.getElementById('duration-input');
 
         function formatDuration(seconds) {
-            // Calculate hours, minutes, and seconds
             const hours = Math.floor(seconds / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
             const secs = seconds % 60;
-
-            // Format hours, minutes, and seconds to be two digits
-            const formattedHours = String(hours).padStart(2, '0');
-            const formattedMinutes = String(minutes).padStart(2, '0');
-            const formattedSeconds = String(secs).padStart(2, '0');
-
-            // Return formatted time
-            return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
         function updateDuration() {
             const from = new Date(fromDatetime.value);
             const to = new Date(toDatetime.value);
-
             if (from && to && to >= from) {
                 const durationMs = to - from;
                 const durationSeconds = Math.floor(durationMs / 1000);
-
                 durationInput.value = formatDuration(durationSeconds);
             } else {
                 durationInput.value = '';
@@ -100,35 +98,35 @@ document.addEventListener('DOMContentLoaded', function () {
         toDatetime.addEventListener('change', updateDuration);
     }
 
-
     async function fetchInterruptions() {
         try {
             const response = await fetch('/api/interruptions');
             const interruptions = await response.json();
             const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
 
             interruptions.forEach(interruption => {
-                if (interruption.substationName === currentSubstation) { // Display only for current substation
+                if (interruption.substationName === currentSubstation) {
                     const newRow = tableBody.insertRow();
                     newRow.setAttribute('data-serial', ++highestSerialNumber);
                     newRow.insertCell().textContent = highestSerialNumber;
                     newRow.insertCell().textContent = interruption.substationName;
                     newRow.insertCell().textContent = interruption.feederName;
                     newRow.insertCell().textContent = interruption.cause;
-                    newRow.insertCell().textContent = new Date(interruption.fromDatetime).toLocaleString();
-                    newRow.insertCell().textContent = new Date(interruption.toDatetime).toLocaleString();
+                    newRow.insertCell().textContent = new Date(interruption.fromDatetime).toLocaleString('en-IN', dateOptions);
+                    newRow.insertCell().textContent = new Date(interruption.toDatetime).toLocaleString('en-IN', dateOptions);
                     newRow.insertCell().textContent = interruption.duration;
 
                     const actionsCell = newRow.insertCell();
                     const editButton = document.createElement('button');
                     editButton.textContent = 'Edit';
-                    editButton.className = 'button-edit'; // Add class for styling
+                    editButton.className = 'button-edit';
                     editButton.addEventListener('click', () => handleEdit(newRow, interruption._id));
                     actionsCell.appendChild(editButton);
 
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Delete';
-                    deleteButton.className = 'button-delete'; // Add class for styling
+                    deleteButton.className = 'button-delete';
                     deleteButton.addEventListener('click', () => handleDelete(newRow, interruption._id));
                     actionsCell.appendChild(deleteButton);
                 }
@@ -138,10 +136,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function formatDateForInput(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
     function handleFormSubmit(event) {
         event.preventDefault();
-
-        calculateDuration(); // Ensure duration is updated before submission
+        calculateDuration();
 
         const substationName = document.getElementById('substation-dropdown').value;
         const feederName = document.getElementById('sub-substation-select').value;
@@ -150,65 +157,49 @@ document.addEventListener('DOMContentLoaded', function () {
         const toDatetime = document.getElementById('to-datetime').value;
         const duration = document.getElementById('duration-input').value;
 
-        const interruptionData = {
-            substationName,
-            feederName,
-            cause,
-            fromDatetime,
-            toDatetime,
-            duration
-        };
+        const interruptionData = { substationName, feederName, cause, fromDatetime, toDatetime, duration };
 
         const showPopup = () => {
             const popup = document.getElementById('success-popup');
             popup.classList.remove('hidden');
             popup.classList.add('visible');
-
             setTimeout(() => {
                 popup.classList.remove('visible');
                 popup.classList.add('hidden');
-            }, 1500); // Show for 1.5 seconds
+            }, 1500);
         };
 
         if (editingId) {
-            // Update existing interruption
             fetch(`/api/interruptions/${editingId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(interruptionData)
             })
             .then(response => response.json())
             .then(updatedInterruption => {
                 const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
                 const rows = tableBody.getElementsByTagName('tr');
-
                 for (const row of rows) {
                     if (row.getAttribute('data-serial') == highestSerialNumber) {
                         row.cells[1].textContent = updatedInterruption.substationName;
                         row.cells[2].textContent = updatedInterruption.feederName;
                         row.cells[3].textContent = updatedInterruption.cause;
-                        row.cells[4].textContent = new Date(updatedInterruption.fromDatetime).toLocaleString();
-                        row.cells[5].textContent = new Date(updatedInterruption.toDatetime).toLocaleString();
+                        row.cells[4].textContent = new Date(updatedInterruption.fromDatetime).toLocaleString('en-IN', dateOptions);
+                        row.cells[5].textContent = new Date(updatedInterruption.toDatetime).toLocaleString('en-IN', dateOptions);
                         row.cells[6].textContent = updatedInterruption.duration;
                         break;
                     }
                 }
-
                 document.getElementById('interruption-form').reset();
-                editingId = null; // Reset editingId after successful update
-                populateDropdowns(); // Repopulate dropdowns after reset
-                showPopup(); // Show success popup
+                editingId = null;
+                populateDropdowns();
+                showPopup();
             })
             .catch(error => console.error('Error updating interruption:', error));
         } else {
-            // Add new interruption
             fetch('/api/interruptions', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(interruptionData)
             })
             .then(response => response.json())
@@ -220,28 +211,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 newRow.insertCell().textContent = data.substationName;
                 newRow.insertCell().textContent = data.feederName;
                 newRow.insertCell().textContent = data.cause;
-                newRow.insertCell().textContent = new Date(data.fromDatetime).toLocaleString();
-                newRow.insertCell().textContent = new Date(data.toDatetime).toLocaleString();
+                newRow.insertCell().textContent = new Date(data.fromDatetime).toLocaleString('en-IN', dateOptions);
+                newRow.insertCell().textContent = new Date(data.toDatetime).toLocaleString('en-IN', dateOptions);
                 newRow.insertCell().textContent = data.duration;
 
                 const actionsCell = newRow.insertCell();
-
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Edit';
-                editButton.className = 'button-edit'; // Add class for styling
+                editButton.className = 'button-edit';
                 editButton.addEventListener('click', () => handleEdit(newRow, data._id));
                 actionsCell.appendChild(editButton);
 
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.className = 'button-delete'; // Add class for styling
+                deleteButton.className = 'button-delete';
                 deleteButton.addEventListener('click', () => handleDelete(newRow, data._id));
                 actionsCell.appendChild(deleteButton);
 
-
                 document.getElementById('interruption-form').reset();
-                populateDropdowns(); // Repopulate dropdowns after reset
-                showPopup(); // Show success popup
+                populateDropdowns();
+                showPopup();
             })
             .catch(error => console.error('Error submitting interruption:', error));
         }
@@ -253,21 +242,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('substation-dropdown').value = cells[1].textContent;
         document.getElementById('sub-substation-select').value = cells[2].textContent;
         document.getElementById('cause-input').value = cells[3].textContent;
-        document.getElementById('from-datetime').value = cells[4].textContent;
-        document.getElementById('to-datetime').value = cells[5].textContent;
+        document.getElementById('from-datetime').value = formatDateForInput(new Date(cells[4].textContent));
+        document.getElementById('to-datetime').value = formatDateForInput(new Date(cells[5].textContent));
         document.getElementById('duration-input').value = cells[6].textContent;
-
-        row.parentNode.removeChild(row); // Remove row from table after clicking edit
+        row.parentNode.removeChild(row);
     }
 
     function handleDelete(row, id) {
         if (confirm('Are you sure you want to delete this interruption?')) {
-            fetch(`/api/interruptions/${id}`, {
-                method: 'DELETE'
-            })
-            .then(() => {
-                row.remove();
-            })
+            fetch(`/api/interruptions/${id}`, { method: 'DELETE' })
+            .then(() => row.remove())
             .catch(error => console.error('Error deleting interruption:', error));
         }
     }
@@ -279,29 +263,20 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Function to handle user logout
     function handleLogout() {
-        // Ask for user confirmation
         const confirmLogout = confirm('Are you sure you want to logout?');
-        
         if (confirmLogout) {
             fetch('/api/logout', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(response => {
                 if (response.ok) {
-                    // Remove substationName from session storage
                     sessionStorage.removeItem('substationName');
-
-                    // Notify user and redirect
                     alert('Logout successful!');
                     history.replaceState(null, null, '/login.html');
-                    window.location.replace('/login.html'); // Redirect to login page or home page
+                    window.location.replace('/login.html');
                 } else {
-                    // Handle server-side errors
                     return response.json().then(data => {
                         console.error('Logout failed:', data.message || 'Unknown error');
                         alert('Logout failed: ' + (data.message || 'Unknown error'));
@@ -315,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Add event listener to logout button
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', handleLogout);
@@ -325,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const loggedInSubstationName = "220/132/33KV Tandur"; // Replace with actual dynamic value
+    const loggedInSubstationName = "220/132/33KV Tandur";
     const substations = [
         { name: "220/132/33KV Tandur", subSubstations: ["33KV Basheerabad", "33KV Karankote", "33KV Tandur", "33KV Turmamidi", "33kv Yalal", "33KV Bommarspet", "33KV Peddamul", "33KV Gouthapur", "33KV Mythra Solar", "33KV Vikarabad"] },
         { name: "220KV SS Chandanavally", subSubstations: ["33KV WAMIL", "33KV WFL", "33KV Chandanvally IP"] },
@@ -348,13 +322,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function populateFeederFilter() {
         const feeders = new Set();
-
         substations.forEach(substation => {
             if (substation.name === loggedInSubstationName) {
                 substation.subSubstations.forEach(feeder => feeders.add(feeder));
             }
         });
-
         feeders.forEach(feeder => {
             const option = document.createElement('option');
             option.value = feeder;
@@ -364,14 +336,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function applyFilters() {
-        console.log('Applying filters...');
-
         const feederValue = feederFilter.value.toLowerCase();
         const causeValue = causeFilter.value.toLowerCase();
         const fromDateValue = new Date(fromDateFilter.value);
         const toDateValue = new Date(toDateFilter.value);
-
-        console.log({ feederValue, causeValue, fromDateValue, toDateValue });
 
         Array.from(table.getElementsByTagName('tbody')[0].getElementsByTagName('tr')).forEach(row => {
             const feederCell = row.cells[2].textContent.toLowerCase();
@@ -379,34 +347,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const fromDateCell = new Date(row.cells[4].textContent);
             const toDateCell = new Date(row.cells[5].textContent);
 
-            console.log({ feederCell, causeCell, fromDateCell, toDateCell });
-
             let feederMatch = feederValue === '' || feederCell.includes(feederValue);
             let causeMatch = causeValue === '' || causeCell.includes(causeValue);
             let fromDateMatch = !fromDateFilter.value || (fromDateCell >= fromDateValue);
             let toDateMatch = !toDateFilter.value || (toDateCell <= toDateValue);
 
-            console.log({ feederMatch, causeMatch, fromDateMatch, toDateMatch });
-
-            if (feederMatch && causeMatch && fromDateMatch && toDateMatch) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+            row.style.display = (feederMatch && causeMatch && fromDateMatch && toDateMatch) ? '' : 'none';
         });
     }
 
     filterButton.addEventListener('click', applyFilters);
-
-    clearFiltersButton.addEventListener('click', function () {
+    clearFiltersButton.addEventListener('click', () => {
         feederFilter.value = '';
         causeFilter.value = '';
         fromDateFilter.value = '';
         toDateFilter.value = '';
-        applyFilters(); // Re-apply filters to show all rows
+        applyFilters();
     });
 
-    populateFeederFilter(); // Populate the feeder filter on page load
+    populateFeederFilter();
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -418,54 +377,33 @@ document.addEventListener('DOMContentLoaded', function () {
         rows.sort((a, b) => {
             const cellA = a.cells[columnIndex].textContent.trim();
             const cellB = b.cells[columnIndex].textContent.trim();
-
             const dateA = new Date(cellA);
             const dateB = new Date(cellB);
-
-            if (ascending) {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
+            return ascending ? dateA - dateB : dateB - dateA;
         });
-
         rows.forEach(row => tableBody.appendChild(row));
     }
 
-    function handleSort() {
+    sortBySelect.addEventListener('change', () => {
         const sortValue = sortBySelect.value;
-        
         switch (sortValue) {
-            case 'from-asc':
-                sortTable(4, true); // Sort by "From Date and Time" ascending
-                break;
-            case 'from-desc':
-                sortTable(4, false); // Sort by "From Date and Time" descending
-                break;
-            case 'to-asc':
-                sortTable(5, true); // Sort by "To Date and Time" ascending
-                break;
-            case 'to-desc':
-                sortTable(5, false); // Sort by "To Date and Time" descending
-                break;
-            default:
-                // No sorting
-                break;
+            case 'from-asc': sortTable(4, true); break;
+            case 'from-desc': sortTable(4, false); break;
+            case 'to-asc': sortTable(5, true); break;
+            case 'to-desc': sortTable(5, false); break;
         }
-    }
-
-    sortBySelect.addEventListener('change', handleSort);
+    });
 });
 
 window.onload = function() {
-    fetch('/api/check-auth') // Create an endpoint to check if the user is authenticated
-        .then(response => {
-            if (response.status === 401) {
-                window.location.href = '/login.html'; // Redirect to login page if not authenticated
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+    fetch('/api/check-auth')
+    .then(response => {
+        if (response.status === 401) {
             window.location.href = '/login.html';
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.href = '/login.html';
+    });
 };

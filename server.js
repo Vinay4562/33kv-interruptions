@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Fix typo
+app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -19,9 +19,16 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('MongoDB connected...'))
 .catch(err => console.error('Database connection error:', err));
 
+// Load credentials from .env
+const credentials = process.env.CREDENTIALS ? JSON.parse(process.env.CREDENTIALS) : {};
+if (Object.keys(credentials).length === 0) {
+    console.error('No credentials found in .env file. Please set CREDENTIALS.');
+    process.exit(1); // Exit if credentials are missing
+}
+
 // Initialize session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'chantichanti2255', // Ensure this is set
+    secret: process.env.SESSION_SECRET || 'chantichanti2255',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
@@ -50,18 +57,6 @@ passport.deserializeUser((username, done) => {
     done(null, { username, substation });
 });
 
-const credentials = {
-    "220/132/33KV Tandur": { username: "tandur220kv", password: "tandur@V514" },
-    "220KV SS Chandanavally": { username: "chandanavally220kv", password: "chandanavally@V168" },
-    "132/33KV Kodangal": { username: "kodangal132kv", password: "kodangal@V784" },
-    "132/33KV Kanakamamidi": { username: "kanakamamidi132kv", password: "kanakamamidi@V642" },
-    "132/33KVSS Parigi": { username: "parigi132kv", password: "parigi@V326" },
-    "132/33KVSS Puttapahad": { username: "puttapahad132kv", password: "puttapahad@V198" },
-    "132/33KVSS  SRIRANGAPUR": { username: "srirangapur132kv", password: "srirangapur@V446" },
-    "132/33KVSS  Vikarabad": { username: "vikarabad132kv", password: "vikarabad@V156" },
-    "132/33KV Donthanpally": { username: "donthanpally132kv", password: "donthanpally@V848" }
-};
-
 app.get('/interruption.html', ensureAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'interruption.html'));
 });
@@ -72,7 +67,6 @@ function ensureAuthenticated(req, res, next) {
     }
     res.redirect('/login.html'); // Redirect to login page if not authenticated
 }
-
 
 // Login route
 app.post('/login', (req, res, next) => {
@@ -87,7 +81,6 @@ app.post('/login', (req, res, next) => {
         });
     })(req, res, next);
 });
-
 
 // Logout route
 app.post('/api/logout', (req, res) => {

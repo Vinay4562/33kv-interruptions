@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const interruptions = await response.json();
             const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = ''; // Clear existing rows
+            highestSerialNumber = 0; // Reset serial number for consistency
 
             interruptions.forEach(interruption => {
                 if (interruption.substationName === currentSubstation) {
@@ -175,6 +176,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 1500);
         };
 
+        const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
+
         if (editingId) {
             fetch(`/api/interruptions/${editingId}`, {
                 method: 'PUT',
@@ -183,19 +186,30 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(updatedInterruption => {
-                const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
-                const rows = tableBody.getElementsByTagName('tr');
-                for (const row of rows) {
-                    if (row.getAttribute('data-serial') == highestSerialNumber) {
-                        row.cells[1].textContent = updatedInterruption.substationName;
-                        row.cells[2].textContent = updatedInterruption.feederName;
-                        row.cells[3].textContent = updatedInterruption.cause;
-                        row.cells[4].textContent = new Date(updatedInterruption.fromDatetime).toLocaleString('en-IN', dateOptions);
-                        row.cells[5].textContent = new Date(updatedInterruption.toDatetime).toLocaleString('en-IN', dateOptions);
-                        row.cells[6].textContent = updatedInterruption.duration;
-                        break;
-                    }
-                }
+                // Insert a new row instead of updating a removed one
+                const newRow = tableBody.insertRow();
+                newRow.setAttribute('data-serial', ++highestSerialNumber);
+                newRow.insertCell().textContent = highestSerialNumber;
+                newRow.insertCell().textContent = updatedInterruption.substationName;
+                newRow.insertCell().textContent = updatedInterruption.feederName;
+                newRow.insertCell().textContent = updatedInterruption.cause;
+                newRow.insertCell().textContent = new Date(updatedInterruption.fromDatetime).toLocaleString('en-IN', dateOptions);
+                newRow.insertCell().textContent = new Date(updatedInterruption.toDatetime).toLocaleString('en-IN', dateOptions);
+                newRow.insertCell().textContent = updatedInterruption.duration;
+
+                const actionsCell = newRow.insertCell();
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'button-edit';
+                editButton.addEventListener('click', () => handleEdit(newRow, updatedInterruption._id));
+                actionsCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'button-delete';
+                deleteButton.addEventListener('click', () => handleDelete(newRow, updatedInterruption._id));
+                actionsCell.appendChild(deleteButton);
+
                 document.getElementById('interruption-form').reset();
                 editingId = null;
                 populateDropdowns();
@@ -210,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                const tableBody = document.getElementById('interruption-table').getElementsByTagName('tbody')[0];
                 const newRow = tableBody.insertRow();
                 newRow.setAttribute('data-serial', ++highestSerialNumber);
                 newRow.insertCell().textContent = highestSerialNumber;
@@ -253,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('from-datetime').value = formatDateForInput(fromDate);
         document.getElementById('to-datetime').value = formatDateForInput(toDate);
         document.getElementById('duration-input').value = cells[6].textContent;
-        row.parentNode.removeChild(row);
+        row.parentNode.removeChild(row); // Remove the row being edited
     }
 
     function handleDelete(row, id) {

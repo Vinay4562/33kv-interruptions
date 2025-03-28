@@ -118,7 +118,7 @@ app.get('/api/interruptions', async (req, res) => {
     try {
         let query = {};
         if (fromDate && toDate) {
-            query.fromDatetime = { $gte: fromDate, $lte: toDate }; // Use ISO strings directly
+            query.fromDatetime = { $gte: new Date(fromDate), $lte: new Date(toDate) };
         }
         const interruptions = await Interruption.find(query);
         res.json(interruptions);
@@ -138,10 +138,15 @@ app.get('/filter-feeders', async (req, res) => {
     }
 });
 
+// In server.js, modify POST route to log and verify incoming data
 app.post('/api/interruptions', async (req, res) => {
     try {
-        console.log('Received interruption data:', req.body); // Log incoming data
-        const interruption = new Interruption(req.body);
+        console.log('Received data:', req.body); // Log to check incoming times
+        const interruption = new Interruption({
+            ...req.body,
+            fromDatetime: new Date(req.body.fromDatetime), // Ensure proper Date object
+            toDatetime: new Date(req.body.toDatetime)
+        });
         await interruption.save();
         res.status(201).json(interruption);
     } catch (err) {

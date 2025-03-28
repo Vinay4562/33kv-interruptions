@@ -136,8 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function formatDateForInput(dateString) {
-        const date = new Date(dateString);
+    function formatDateForInput(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -153,11 +152,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const substationName = document.getElementById('substation-dropdown').value;
         const feederName = document.getElementById('sub-substation-select').value;
         const cause = document.getElementById('cause-input').value;
-        const fromDatetime = document.getElementById('from-datetime').value;
-        const toDatetime = document.getElementById('to-datetime').value;
+        const fromDatetime = new Date(document.getElementById('from-datetime').value).toISOString();
+        const toDatetime = new Date(document.getElementById('to-datetime').value).toISOString();
         const duration = document.getElementById('duration-input').value;
 
-        const interruptionData = { substationName, feederName, cause, fromDatetime, toDatetime, duration };
+        const interruptionData = {
+            substationName,
+            feederName,
+            cause,
+            fromDatetime,
+            toDatetime,
+            duration
+        };
 
         const showPopup = () => {
             const popup = document.getElementById('success-popup');
@@ -242,8 +248,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('substation-dropdown').value = cells[1].textContent;
         document.getElementById('sub-substation-select').value = cells[2].textContent;
         document.getElementById('cause-input').value = cells[3].textContent;
-        document.getElementById('from-datetime').value = formatDateForInput(new Date(cells[4].textContent));
-        document.getElementById('to-datetime').value = formatDateForInput(new Date(cells[5].textContent));
+        const fromDate = new Date(cells[4].textContent + ' UTC'); // Parse as UTC since stored as UTC
+        const toDate = new Date(cells[5].textContent + ' UTC');
+        document.getElementById('from-datetime').value = formatDateForInput(fromDate);
+        document.getElementById('to-datetime').value = formatDateForInput(toDate);
         document.getElementById('duration-input').value = cells[6].textContent;
         row.parentNode.removeChild(row);
     }

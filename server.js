@@ -19,11 +19,21 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('MongoDB connected...'))
 .catch(err => console.error('Database connection error:', err));
 
-// Load credentials from .env
-const credentials = process.env.CREDENTIALS ? JSON.parse(process.env.CREDENTIALS) : {};
+// Load credentials from .env with error handling
+let credentials = {};
+try {
+    if (process.env.CREDENTIALS) {
+        credentials = JSON.parse(process.env.CREDENTIALS);
+    } else {
+        throw new Error('CREDENTIALS environment variable is not set.');
+    }
+} catch (err) {
+    console.error('Error loading credentials from .env:', err.message);
+    process.exit(1);
+}
 if (Object.keys(credentials).length === 0) {
-    console.error('No credentials found in .env file. Please set CREDENTIALS.');
-    process.exit(1); // Exit if credentials are missing
+    console.error('Credentials object is empty. Please check CREDENTIALS in .env.');
+    process.exit(1);
 }
 
 // Initialize session
@@ -65,7 +75,7 @@ function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/login.html'); // Redirect to login page if not authenticated
+    res.redirect('/login.html');
 }
 
 // Login route
@@ -88,9 +98,7 @@ app.post('/api/logout', (req, res) => {
         if (err) {
             return res.status(500).json({ message: 'Logout error' });
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
-        
-        // Prevent caching
+        res.clearCookie('connect.sid');
         res.setHeader('Cache-Control', 'no-store');
         res.status(200).json({ message: 'Logged out successfully' });
     });
@@ -122,9 +130,7 @@ app.get('/api/interruptions', async (req, res) => {
 
 app.get('/filter-feeders', async (req, res) => {
     const userSubstation = req.session.substation;
-    
     try {
-        // Fetch feeders based on the user's substation
         const feeders = await Feeders.find({ substation: userSubstation });
         res.json(feeders);
     } catch (err) {

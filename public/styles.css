@@ -9,58 +9,46 @@ body {
 
 .header {
     background-color: #e9ecef;
-    color: red;
-    font-size: 36px;
-    text-decoration: underline 2px;
-    padding: 10px 0; /* reduced vertical padding */
-    text-align: center;
-    margin-bottom: 0px;
+    padding: 20px 0;
+    margin-bottom: 40px;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100px;
 }
 
 .header img {
     position: absolute;
-    top: 10px;
+    top: 15px;
     left: 25px;
     width: 120px;
     height: 100px;
 }
 
-/* Desktop and Mobile Title Styling */
+.header header {
+    text-align: center;
+}
+
 .desktop-title {
     display: block;
-    font-size: 35px;
     color: red;
+    font-size: 35px;
+    text-decoration: underline 2px;
 }
 
 .mobile-title {
-    display: none;
-    font-size: 22px;
-    color: red;
-    position: absolute;
-    top: 60px; /* behind logo vertically */
-    left: 10px;
-    right: 10px;
-    text-align: center;
-    z-index: 1;
+    display: none; /* Hidden by default in desktop view */
 }
 
-/* Navbar Styling */
 .navbar {
     background-color: #e9ecef;
     overflow: hidden;
     display: flex;
-    justify-content: flex-end;
+    justify-content: right;
     align-items: center;
-    padding: 0 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+    padding-top: 0px;
     width: 100%;
-    top: 0;
+    top: 50px;
     z-index: 1000;
-    margin: 0;
 }
 
 .navbar a {
@@ -82,28 +70,8 @@ body {
     font-weight: bold;
 }
 
-.navbar button#logout-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    margin: 0;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-.navbar button#logout-button:hover {
-    background-color: #e53935;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.navbar button#logout-button:active {
-    background-color: #c62828;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.navbar a:last-child {
+    margin-right: 10px;
 }
 
 .container {
@@ -159,9 +127,7 @@ h1, h2 {
     margin-right: 5px;
 }
 
-.filter-container input,
-.filter-container select,
-.filter-container button {
+.filter-container input, .filter-container select, .filter-container button {
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -201,17 +167,14 @@ form label {
     color: #555;
 }
 
-form input,
-form select,
-form button {
+form input, form select, form button {
     margin-bottom: 15px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
 }
 
-form input:focus,
-form select:focus {
+form input:focus, form select:focus {
     border-color: #4CAF50;
     outline: none;
 }
@@ -244,14 +207,11 @@ table {
     margin: 20px 0;
 }
 
-table,
-th,
-td {
+table, th, td {
     border: 1px solid #ddd;
 }
 
-table th,
-table td {
+table th, table td {
     padding: 12px;
     text-align: left;
 }
@@ -269,8 +229,7 @@ table tbody tr:hover {
     background-color: #f1f1f1;
 }
 
-.button-edit,
-.button-delete {
+.button-edit, .button-delete {
     padding: 8px 16px;
     margin-right: 10px;
     border-radius: 8px;
@@ -328,8 +287,7 @@ table tbody tr:hover {
 /* Mobile View Styles */
 @media (max-width: 768px) {
     .header {
-        padding: 10px 0;
-        min-height: 100px;
+        padding: 20px 0;
     }
 
     .header img {
@@ -340,25 +298,36 @@ table tbody tr:hover {
     }
 
     .desktop-title {
-        display: none;
+        display: none; /* Hide desktop title in mobile view */
     }
 
     .mobile-title {
         display: block;
+        color: red;
+        font-size: clamp(20px, 4vw, 30px);
+        text-decoration: underline 2px;
+        margin-left: 100px; /* Position near logo */
+        line-height: 60px; /* Align vertically with logo */
     }
 
     .navbar {
-        flex-direction: row;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 0 10px;
-        margin: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px;
+        box-shadow: none;
+    }
+
+    .navbar a {
+        margin-left: 0;
+        margin-bottom: 10px;
+        text-align: left;
     }
 
     .navbar button#logout-button {
+        margin-right: 0;
+        margin-bottom: 10px;
         font-size: 14px;
         padding: 8px 15px;
-        margin: 0;
     }
 
     .container {
@@ -395,10 +364,32 @@ table tbody tr:hover {
         margin: 10px 0;
     }
 
-    form input,
-    form select,
-    form button {
+    form input, form select, form button {
         margin-bottom: 10px;
         width: 100%;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        font-size: 14px;
+        width: 100%;
+    }
+
+    table th, table td {
+        padding: 10px;
+    }
+
+    .button-edit, .button-delete {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .popup {
+        width: 90%;
+        padding: 15px;
     }
 }

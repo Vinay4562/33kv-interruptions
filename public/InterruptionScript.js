@@ -417,14 +417,21 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 window.onload = function() {
-    fetch('/api/check-auth')
+    fetch('/api/check-auth', {
+        credentials: 'include' // Include cookies with the request
+    })
     .then(response => {
+        console.log('Check-auth response:', response.status);
         if (response.status === 401) {
             window.location.href = '/login.html';
+        } else {
+            return response.json().then(data => {
+                console.log('Auth data:', data);
+                // Page can load normally if authenticated
+            });
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        window.location.href = '/login.html';
+        console.error('Error checking auth:', error);
     });
 };

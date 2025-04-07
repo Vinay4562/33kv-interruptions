@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
@@ -41,32 +42,48 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'chantichanti2255',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URI,
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60 // 24 hours in seconds
+    }),
+    cookie: {
+        secure: false, // Set to true if using HTTPS
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        httpOnly: true
+    }
 }));
 
 // Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport.js configuration
+// Passport Configuration
 passport.use(new LocalStrategy((username, password, done) => {
-    const substation = Object.keys(credentials).find(substation => credentials[substation].username === username);
+    const credentials = JSON.parse(process.env.CREDENTIALS || '{}');
+    const substation = Object.keys(credentials).find(sub => credentials[sub].username === username);
     if (substation && credentials[substation].password === password) {
         return done(null, { username, substation });
-    } else {
-        return done(null, false, { message: 'Invalid username or password' });
     }
+    return done(null, false, { message: 'Invalid username or password' });
 }));
 
 passport.serializeUser((user, done) => {
-    done(null, user.username);
+    done(null, { username: user.username, substation: user.substation });
 });
 
-passport.deserializeUser((username, done) => {
-    const substation = Object.keys(credentials).find(substation => credentials[substation].username === username);
-    done(null, { username, substation });
+passport.deserializeUser((userObj, done) => {
+    done(null, userObj);
 });
 
+// Middleware to log session info for debugging
+app.use((req, res, next) => {
+    console.log('Session:', req.session);
+    console.log('User:', req.user);
+    next();
+});
+
+// Serve interruption.html with authentication check
 app.get('/interruption.html', ensureAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'interruption.html'));
 });
@@ -79,17 +96,9 @@ function ensureAuthenticated(req, res, next) {
 }
 
 // Login route
-app.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) return next(err);
-        if (!user) {
-            return res.status(401).json({ success: false, message: info.message });
-        }
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            return res.json({ success: true, substation: user.substation });
-        });
-    })(req, res, next);
+app.post('/login', passport.authenticate('local'), (req, res) => {
+    console.log('Login successful, user:', req.user);
+    res.json({ success: true, substation: req.user.substation });
 });
 
 // Logout route
@@ -105,8 +114,9 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/check-auth', (req, res) => {
+    console.log('Check-auth called, authenticated:', req.isAuthenticated());
     if (req.isAuthenticated()) {
-        res.status(200).json({ authenticated: true });
+        res.status(200).json({ authenticated: true, substation: req.user.substation });
     } else {
         res.status(401).json({ authenticated: false });
     }

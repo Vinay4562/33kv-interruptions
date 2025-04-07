@@ -287,7 +287,11 @@ table tbody tr:hover {
 /* Mobile View Styles */
 @media (max-width: 768px) {
     .header {
-        padding: 20px 0;
+        padding: 10px 0; /* Reduced padding for tighter layout */
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 0; /* Remove space below header */
     }
 
     .header img {
@@ -295,6 +299,8 @@ table tbody tr:hover {
         height: 60px;
         top: 10px;
         left: 10px;
+        position: static; /* Remove absolute positioning */
+        margin-right: 10px; /* Space between logo and title */
     }
 
     .desktop-title {
@@ -306,26 +312,27 @@ table tbody tr:hover {
         color: red;
         font-size: clamp(20px, 4vw, 30px);
         text-decoration: underline 2px;
-        margin-left: 100px; /* Position near logo */
-        line-height: 60px; /* Align vertically with logo */
+        font-weight: bold; /* Make TG TRANSCO bold */
+        margin: 0; /* Remove default margins */
     }
 
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px;
+        flex-direction: row; /* Keep horizontal layout */
+        align-items: center;
+        justify-content: flex-end; /* Align logout button to right */
+        padding: 5px 10px; /* Reduced padding */
         box-shadow: none;
+        margin-top: 0; /* Remove space above navbar */
     }
 
     .navbar a {
         margin-left: 0;
-        margin-bottom: 10px;
+        margin-bottom: 0; /* Remove vertical spacing */
         text-align: left;
     }
 
     .navbar button#logout-button {
-        margin-right: 0;
-        margin-bottom: 10px;
+        margin: 0 10px 0 0; /* Remove bottom margin, keep right margin */
         font-size: 14px;
         padding: 8px 15px;
     }

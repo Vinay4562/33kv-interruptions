@@ -287,6 +287,23 @@
                 left: 10px;
             }
 
+            .header header::before {
+                content: "TG TRANSCO";
+                display: block;
+                font-size: clamp(24px, 5vw, 35px); /* Responsive size between 24px and 35px */
+            }
+            
+            .header header {
+                /* Hide original content while keeping structure */
+                color: transparent;
+                text-decoration: none;
+                font-size: 0;
+            }
+            
+            .header header::after {
+                content: none; /* Remove any potential after content */
+            }
+
             .navbar {
                 flex-direction: column;
                 align-items: flex-start;

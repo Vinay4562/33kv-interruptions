@@ -9,6 +9,66 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="InterruptionsDashboardCSS.css">
+    <style>
+/* WhatsApp Floating Button Styles with Animation */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: none; /* Hidden by default, shown via JS */
+}
+
+.whatsapp-btn {
+  background-color: #25D366; /* WhatsApp green */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  cursor: pointer;
+  animation: zoomInOut 2s infinite ease-in-out;
+  overflow: hidden; /* Ensures no overflow */
+}
+
+@keyframes zoomInOut {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.whatsapp-options {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.whatsapp-option {
+  padding: 8px 15px;
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.whatsapp-option:hover {
+  background-color: #f0f0f0;
+}
+
+@media (min-width: 769px) {
+  .whatsapp-float {
+    display: none !important;
+  }
+}
+    </style>
 </head>
 <body>
 
@@ -76,8 +136,19 @@
     <!-- Add a loading spinner element -->
     <div class="loading" id="loading">Loading...</div>
 
+    <!-- WhatsApp Floating Button -->
+    <div class="whatsapp-float" id="whatsappFloat">
+        <div class="whatsapp-btn" id="whatsappBtn">
+            <i class="fab fa-whatsapp fa-2x" style="color: white;"></i>
+        </div>
+        <div class="whatsapp-options" id="whatsappOptions">
+            <a class="whatsapp-option" id="sharePdf">Share PDF</a>
+            <a class="whatsapp-option" id="shareExcel">Share Excel</a>
+        </div>
+    </div>
+
     <footer class="footer">
-        <p>&copy; 2025 Transimission Corporation of Telangana Limited All rights reserved.</p>
+        <p>© 2025 Transmission Corporation of Telangana Limited All rights reserved.</p>
     </footer>
 
     <script>
@@ -93,49 +164,47 @@
             '132/33KV Donthanpally': ["33KV IBS", "33KV GARGI STEELS", "33KV PRAGATHI", "33KV NANAKRAMGUDA", "33KV VATTINAGULAPALLY", "33KV NARSINGHI", "33KV CBIT", "33KV SHANKARPALLY", "33 KV MEDHA SERVO", "33kV SIFY"]
         };
 
+        let selectedFromDate = '';
+        let selectedToDate = '';
+        let interruptionsData = [];
+
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return '***';
-
             const date = new Date(dateTimeString);
             if (isNaN(date.getTime())) return '***';
-
             const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
-
             return `${day}-${month}-${year} & ${hours}:${minutes}:${seconds}hrs`;
         }
 
         function formatDate(dateString) {
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return '***';
-            
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
-            
             return `${day}-${month}-${year}`;
         }
 
         function fetchInterruptions() {
-            const fromDate = document.getElementById('fromDate').value;
-            const toDate = document.getElementById('toDate').value;
+            selectedFromDate = document.getElementById('fromDate').value;
+            selectedToDate = document.getElementById('toDate').value;
 
-            if (!fromDate || !toDate) {
+            if (!selectedFromDate || !selectedToDate) {
                 alert('Please provide both "From Date" and "To Date" to fetch interruptions.');
                 return;
             }
 
-            const formattedFromDate = formatDate(fromDate);
-            const formattedToDate = formatDate(toDate);
+            const formattedFromDate = formatDate(selectedFromDate);
+            const formattedToDate = formatDate(selectedToDate);
 
-            // Show loading spinner
             document.getElementById('loading').style.display = 'block';
 
-            fetch(`/api/interruptions?fromDate=${encodeURIComponent(fromDate)}&toDate=${encodeURIComponent(toDate)}`)
+            fetch(`/api/interruptions?fromDate=${encodeURIComponent(selectedFromDate)}&toDate=${encodeURIComponent(selectedToDate)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Network response was not ok. Status: ${response.status}`);
@@ -149,53 +218,41 @@
                         heading.textContent = `No interruptions found for the selected date range from ${formattedFromDate} to ${formattedToDate}.`;
                         populateTable([]);
                         alert('No Interruptions found');
-                        // Disable download buttons if no data
                         document.getElementById('downloadExcelBtn').disabled = true;
                         document.getElementById('downloadPdfBtn').disabled = true;
+                        hideWhatsAppButton();
                     } else {
                         heading.textContent = `33KV Interruptions for the 400KV Shankarpally division from ${formattedFromDate} to ${formattedToDate}`;
-                        heading.style.display = 'block'; // Make the heading visible
-                        const interruptionsArray = createInterruptionsMap(data);
-                        populateTable(interruptionsArray);
-                        // Enable download buttons when data is loaded
+                        heading.style.display = 'block';
+                        interruptionsData = createInterruptionsMap(data);
+                        populateTable(interruptionsData);
                         document.getElementById('downloadExcelBtn').disabled = false;
                         document.getElementById('downloadPdfBtn').disabled = false;
+                        showWhatsAppButton();
                     }
                 })
                 .catch(error => {
                     console.error('Fetch Interruptions error:', error);
-                    // Disable download buttons on error
                     document.getElementById('downloadExcelBtn').disabled = true;
                     document.getElementById('downloadPdfBtn').disabled = true;
+                    hideWhatsAppButton();
                 })
                 .finally(() => {
-                    // Hide loading spinner
                     document.getElementById('loading').style.display = 'none';
-
-                    // Display the download buttons
                     document.querySelector('.download-buttons').style.display = 'block';
                 });
         }
 
-        // Hamburger menu toggle
         document.querySelector('.hamburger-menu').addEventListener('click', function() {
             const navbar = document.querySelector('.navbar');
             navbar.classList.toggle('active');
         });
 
         function renderInterruptions(interruptions) {
-            // Get the container where interruptions will be displayed
             const interruptionsContainer = document.getElementById('interruptions-container');
-            
-            // Clear any previous content inside the container
             interruptionsContainer.innerHTML = ''; 
-
-            // Iterate over each interruption in the array
             interruptions.forEach(interruption => {
-                // Create a div element to hold the interruption details
                 const interruptionElement = document.createElement('div');
-                
-                // Set the inner HTML of the div with the interruption details
                 interruptionElement.innerHTML = `
                     <div class="interruption-item">
                         <p><strong>Substation:</strong> ${interruption.substationName}</p>
@@ -206,12 +263,8 @@
                     </div>
                     <hr/>
                 `;
-
-                // Append the interruption details div to the container
                 interruptionsContainer.appendChild(interruptionElement);
             });
-
-            // If no interruptions are found, display a message
             if (interruptions.length === 0) {
                 interruptionsContainer.innerHTML = '<p>No interruptions found for the selected date range.</p>';
             }
@@ -219,21 +272,14 @@
 
         function createInterruptionsMap(interruptions) {
             const interruptionsArray = [];
-
-            // Add interruptions for each substation and feeder according to the map
             for (const [substation, feeders] of Object.entries(substationFeederMap)) {
                 feeders.forEach(feeder => {
-                    // Find matching interruptions for this substation and feeder
                     const matchingInterruptions = interruptions.filter(interruption => 
                         interruption.substationName === substation && interruption.feederName === feeder
                     );
-
-                    // Add each interruption to the array
                     matchingInterruptions.forEach(interruption => {
                         interruptionsArray.push(interruption);
                     });
-
-                    // If no interruption is found, add a placeholder
                     if (matchingInterruptions.length === 0) {
                         interruptionsArray.push({
                             substationName: substation,
@@ -246,22 +292,17 @@
                     }
                 });
             }
-
             return interruptionsArray;
         }
 
         function populateTable(interruptions) {
             const tableBody = document.getElementById('interruptionsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
-
             let serialNumber = 1;
-
             interruptions.forEach(interruption => {
                 const row = document.createElement('tr');
-                
                 row.className = interruption.cause === '***' ? 'nil-value' : '';
                 const tooltip = interruption.cause === '***' ? '<div class="tooltip">No data entered</div>' : '';
-
                 row.innerHTML = `
                     <td>${serialNumber++}</td>
                     <td>${interruption.substationName}</td>
@@ -280,7 +321,6 @@
             const input = document.getElementById('searchInput').value.toLowerCase();
             const table = document.getElementById('interruptionsTable');
             const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
             for (let i = 0; i < rows.length; i++) {
                 const cells = rows[i].getElementsByTagName('td');
                 let rowText = '';
@@ -297,54 +337,24 @@
 
         function downloadExcel() {
             const { XLSX } = window;
-
-            // Get the selected dates
-            const fromDate = document.getElementById('fromDate').value;
-            const toDate = document.getElementById('toDate').value;
-
-            // Format the dates for the heading
-            const formattedFromDate = formatDate(fromDate);
-            const formattedToDate = formatDate(toDate);
-
-            // Create a heading for the Excel file
+            const formattedFromDate = formatDate(selectedFromDate);
+            const formattedToDate = formatDate(selectedToDate);
             const heading = `33KV Interruptions from ${formattedFromDate} to ${formattedToDate}`;
-
-            // Prepare the data including the heading
-            const table = document.getElementById('interruptionsTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            const data = [];
-            let serialNumber = 1;
-
-            for (let row of rows) {
-                const cells = row.getElementsByTagName('td');
-                if (cells.length > 0) {
-                    data.push({
-                        "S.No": serialNumber++,
-                        "Substation Name": cells[1].textContent,
-                        "Feeder Name": cells[2].textContent,
-                        "Cause of Interruption": cells[3].textContent,
-                        "From Date & time": cells[4].textContent,
-                        "To Date & time": cells[5].textContent,
-                        "Duration": cells[6].textContent
-                    });
-                }
-            }
-
-            // Create a new workbook
+            const data = interruptionsData.map((interruption, index) => ({
+                "S.No": index + 1,
+                "Substation Name": interruption.substationName,
+                "Feeder Name": interruption.feederName,
+                "Cause of Interruption": interruption.cause,
+                "From Date & time": formatDateTime(interruption.fromDatetime),
+                "To Date & time": formatDateTime(interruption.toDatetime),
+                "Duration": interruption.duration
+            }));
             const wb = XLSX.utils.book_new();
-
-            // Create a worksheet with the data
             const ws = XLSX.utils.json_to_sheet(data, { header: ["S.No", "Substation Name", "Feeder Name", "Cause of Interruption", "From Date & time", "To Date & time", "Duration"] });
-
-            // Insert the heading as the first row in the worksheet
             const wsWithHeading = XLSX.utils.book_new();
             XLSX.utils.sheet_add_aoa(wsWithHeading, [[heading]], { origin: "A1" });
-
-            // Append data below the heading
             const dataRange = XLSX.utils.sheet_to_json(ws, { header: 1 });
             XLSX.utils.sheet_add_aoa(wsWithHeading, dataRange, { origin: "A3" });
-
-            // Adjust column widths (optional)
             wsWithHeading['!cols'] = [
                 { width: 10 },
                 { width: 25 },
@@ -354,63 +364,33 @@
                 { width: 25 },
                 { width: 15 }
             ];
-
-            // Append the worksheet to the workbook
             XLSX.utils.book_append_sheet(wb, wsWithHeading, "Interruptions");
-
-            // Save the workbook
             XLSX.writeFile(wb, "Interruptions.xlsx");
         }
 
         document.getElementById('downloadPdfBtn').addEventListener('click', function () {
-
-            // Get the selected dates
-            const fromDate = document.getElementById('fromDate').value;
-            const toDate = document.getElementById('toDate').value;
-
-            // Function to format date in DD-MM-YYYY
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                const year = date.getFullYear();
-                return `${day}-${month}-${year}`;
-            }
-
-            // Format the dates for the heading
-            const formattedFromDate = formatDate(fromDate);
-            const formattedToDate = formatDate(toDate);
-
+            const formattedFromDate = formatDate(selectedFromDate);
+            const formattedToDate = formatDate(selectedToDate);
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
-            // Add a header
             doc.setFontSize(19);
             doc.setTextColor(40);
             doc.setFont('helvetica', 'bold');
             doc.text('Transmission Corporation of Telangana Limited', 105, 20, { align: 'center' });
-
-            // Add a sub-header with dynamic date range
             doc.setFontSize(14);
             doc.setTextColor(70);
             doc.setFont('helvetica', 'normal');
             doc.text(`33KV Interruptions Data from ${formattedFromDate} to ${formattedToDate}`, 105, 30, { align: 'center' });
-
-            // Add the logo
             const logo = new Image();
-            logo.src = 'logo_new.png'; // Replace with your logo path
+            logo.src = 'logo_new.png';
             logo.onload = function () {
-                doc.addImage(logo, 'PNG', 6, 6, 24, 24); // Adjust the dimensions as needed
-
-                // Add generation date
+                doc.addImage(logo, 'PNG', 6, 6, 24, 24);
                 doc.setFontSize(10);
                 doc.setTextColor(100);
-                doc.text('Generated on: ' + new Date().toLocaleString(), 200, 40, { align: 'right' }); // Adjusted y-coordinate
-
-                // Add the table data to the PDF
+                doc.text('Generated on: ' + new Date().toLocaleString(), 200, 40, { align: 'right' });
                 doc.autoTable({
-                    html: 'table',
-                    startY: 50, // Adjust this according to the height of your header
+                    html: '#interruptionsTable',
+                    startY: 50,
                     styles: {
                         fontSize: 10,
                         cellPadding: 3,
@@ -420,35 +400,183 @@
                         textColor: [0, 0, 0],
                     },
                     headStyles: {
-                        fillColor: [0, 63, 128], // Customizing header color
-                        textColor: [255, 255, 255], // White text for header
+                        fillColor: [0, 63, 128],
+                        textColor: [255, 255, 255],
                         fontSize: 12,
                     },
                     alternateRowStyles: {
-                        fillColor: [240, 240, 240], // Light grey for alternate rows
+                        fillColor: [240, 240, 240],
                     },
                 });
-
-                // Save the PDF
                 doc.save('33KV_Interruptions_Data.pdf');
             };
         });
 
-        // Function to update header title based on screen size
         function updateHeaderTitle() {
-        const headerTitle = document.querySelector('.header-title');
-        if (window.innerWidth <= 999) { // Change at 999px and below
-            headerTitle.textContent = 'TG TRANSCO';
-        } else {
-            headerTitle.textContent = '𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃';
+            const headerTitle = document.querySelector('.header-title');
+            if (window.innerWidth <= 999) {
+                headerTitle.textContent = 'TG TRANSCO';
+            } else {
+                headerTitle.textContent = '𝐓𝐑𝐀𝐍𝐒𝐌𝐈𝐒𝐒𝐈𝐎𝐍 𝐂𝐎𝐑𝐏𝐎𝐑𝐀𝐓𝐈𝐎𝐍 𝐎𝐅 𝐓𝐄𝐋𝐀𝐍𝐆𝐀𝐍𝐀 𝐋𝐈𝐌𝐈𝐓𝐄𝐃';
+            }
         }
-    }
 
-    // Run on page load
-    window.addEventListener('load', updateHeaderTitle);
-    // Run on window resize
-    window.addEventListener('resize', updateHeaderTitle);
+        window.addEventListener('load', updateHeaderTitle);
+        window.addEventListener('resize', updateHeaderTitle);
 
+        // WhatsApp Functionality
+        document.getElementById('whatsappBtn').addEventListener('click', function() {
+            toggleWhatsAppOptions(true);
+        });
+
+        document.addEventListener('click', function(event) {
+            const whatsappFloat = document.getElementById('whatsappFloat');
+            const whatsappOptions = document.getElementById('whatsappOptions');
+            if (!whatsappFloat.contains(event.target) && whatsappOptions.style.display === 'flex') {
+                toggleWhatsAppOptions(false);
+            }
+        });
+
+        document.getElementById('sharePdf').addEventListener('click', function(e) {
+            e.preventDefault();
+            generateAndSharePDF();
+        });
+
+        document.getElementById('shareExcel').addEventListener('click', function(e) {
+            e.preventDefault();
+            generateAndShareExcel();
+        });
+
+        window.addEventListener('resize', function() {
+            if (!isMobileView()) {
+                hideWhatsAppButton();
+            } else if (interruptionsData.length > 0) {
+                showWhatsAppButton();
+            }
+        });
+
+        function toggleWhatsAppOptions(show) {
+            const options = document.getElementById('whatsappOptions');
+            options.style.display = show ? 'flex' : 'none';
+        }
+
+        function isMobileView() {
+            return window.innerWidth <= 768;
+        }
+
+        function showWhatsAppButton() {
+            const whatsappFloat = document.getElementById('whatsappFloat');
+            if (isMobileView() && interruptionsData.length > 0) {
+                whatsappFloat.style.display = 'block';
+            }
+        }
+
+        function hideWhatsAppButton() {
+            const whatsappFloat = document.getElementById('whatsappFloat');
+            whatsappFloat.style.display = 'none';
+            toggleWhatsAppOptions(false);
+        }
+
+        function generateAndSharePDF() {
+            const formattedFromDate = formatDate(selectedFromDate);
+            const formattedToDate = formatDate(selectedToDate);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(19);
+            doc.setTextColor(40);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Transmission Corporation of Telangana Limited', 105, 20, { align: 'center' });
+            doc.setFontSize(14);
+            doc.setTextColor(70);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`33KV Interruptions Data from ${formattedFromDate} to ${formattedToDate}`, 105, 30, { align: 'center' });
+            const logo = new Image();
+            logo.src = 'logo_new.png';
+            logo.onload = function () {
+                doc.addImage(logo, 'PNG', 6, 6, 24, 24);
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text('Generated on: ' + new Date().toLocaleString(), 200, 40, { align: 'right' });
+                doc.autoTable({
+                    html: '#interruptionsTable',
+                    startY: 50,
+                    styles: {
+                        fontSize: 10,
+                        cellPadding: 3,
+                        valign: 'middle',
+                        halign: 'center',
+                        fillColor: [220, 220, 220],
+                        textColor: [0, 0, 0],
+                    },
+                    headStyles: {
+                        fillColor: [0, 63, 128],
+                        textColor: [255, 255, 255],
+                        fontSize: 12,
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240],
+                    },
+                });
+                const pdfBlob = doc.output('blob');
+                const file = new File([pdfBlob], '33KV_Interruptions_Data.pdf', { type: 'application/pdf' });
+                shareViaWhatsApp(file);
+            };
+        }
+
+        function generateAndShareExcel() {
+            const { XLSX } = window;
+            const formattedFromDate = formatDate(selectedFromDate);
+            const formattedToDate = formatDate(selectedToDate);
+            const heading = `33KV Interruptions from ${formattedFromDate} to ${formattedToDate}`;
+            const data = interruptionsData.map((interruption, index) => ({
+                "S.No": index + 1,
+                "Substation Name": interruption.substationName,
+                "Feeder Name": interruption.feederName,
+                "Cause of Interruption": interruption.cause,
+                "From Date & time": formatDateTime(interruption.fromDatetime),
+                "To Date & time": formatDateTime(interruption.toDatetime),
+                "Duration": interruption.duration
+            }));
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data, { header: ["S.No", "Substation Name", "Feeder Name", "Cause of Interruption", "From Date & time", "To Date & time", "Duration"] });
+            const wsWithHeading = XLSX.utils.book_new();
+            XLSX.utils.sheet_add_aoa(wsWithHeading, [[heading]], { origin: "A1" });
+            const dataRange = XLSX.utils.sheet_to_json(ws, { header: 1 });
+            XLSX.utils.sheet_add_aoa(wsWithHeading, dataRange, { origin: "A3" });
+            wsWithHeading['!cols'] = [
+                { width: 10 },
+                { width: 25 },
+                { width: 25 },
+                { width: 20 },
+                { width: 25 },
+                { width: 25 },
+                { width: 15 }
+            ];
+            XLSX.utils.book_append_sheet(wb, wsWithHeading, "Interruptions");
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const file = new File([excelBlob], 'Interruptions.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            shareViaWhatsApp(file);
+        }
+
+        function shareViaWhatsApp(file) {
+            if (navigator.share && isMobileView()) {
+                navigator.share({
+                    files: [file],
+                    title: `33KV Interruptions Report`,
+                    text: `Interruptions data from ${formatDate(selectedFromDate)} to ${formatDate(selectedToDate)}`
+                })
+                .then(() => toggleWhatsAppOptions(false))
+                .catch(error => {
+                    console.error('Error sharing:', error);
+                    alert('Error sharing file. Please try again.');
+                });
+            } else {
+                alert('Web Share API not supported on this device/browser.');
+            }
+        }
+
+        document.getElementById('downloadExcelBtn').addEventListener('click', downloadExcel);
     </script>
 </body>
 </html>

@@ -12,15 +12,19 @@ body {
     color: red;
     font-size: 36px;
     text-decoration: underline 2px;
-    padding: 20px 0;
+    padding: 10px 0; /* reduced vertical padding */
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 0px;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
 }
 
 .header img {
     position: absolute;
-    top: 15px;
+    top: 10px;
     left: 25px;
     width: 120px;
     height: 100px;
@@ -30,13 +34,19 @@ body {
 .desktop-title {
     display: block;
     font-size: 35px;
+    color: red;
 }
 
 .mobile-title {
     display: none;
-    font-size: 28px;
+    font-size: 22px;
     color: red;
-    text-decoration: underline 2px;
+    position: absolute;
+    top: 60px; /* behind logo vertically */
+    left: 10px;
+    right: 10px;
+    text-align: center;
+    z-index: 1;
 }
 
 /* Navbar Styling */
@@ -44,14 +54,13 @@ body {
     background-color: #e9ecef;
     overflow: hidden;
     display: flex;
-    justify-content: right;
+    justify-content: flex-end;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-top: 0;
-    padding-top: 0px;
+    padding: 0 10px;
     width: 100%;
-    top: 50px;
+    top: 0;
     z-index: 1000;
+    margin: 0;
 }
 
 .navbar a {
@@ -73,8 +82,28 @@ body {
     font-weight: bold;
 }
 
-.navbar a:last-child {
-    margin-right: 10px;
+.navbar button#logout-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.navbar button#logout-button:hover {
+    background-color: #e53935;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.navbar button#logout-button:active {
+    background-color: #c62828;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .container {
@@ -299,8 +328,8 @@ table tbody tr:hover {
 /* Mobile View Styles */
 @media (max-width: 768px) {
     .header {
-        position: relative;
-        padding: 60px 0 20px 0;
+        padding: 10px 0;
+        min-height: 100px;
     }
 
     .header img {
@@ -319,23 +348,17 @@ table tbody tr:hover {
     }
 
     .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px;
-        box-shadow: none;
-    }
-
-    .navbar a {
-        margin-left: 0;
-        margin-bottom: 10px;
-        text-align: left;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0 10px;
+        margin: 0;
     }
 
     .navbar button#logout-button {
-        margin-right: 0;
-        margin-bottom: 10px;
         font-size: 14px;
         padding: 8px 15px;
+        margin: 0;
     }
 
     .container {

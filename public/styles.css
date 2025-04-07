@@ -292,6 +292,7 @@ table tbody tr:hover {
         align-items: center;
         justify-content: flex-start;
         margin-bottom: 0; /* Remove space below header */
+        background-color: white;
     }
 
     .header img {
